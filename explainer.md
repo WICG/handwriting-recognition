@@ -1,7 +1,11 @@
 
 # Handwriting Recognition Explainer 
 
-Authors: Jiewei Qian <qjw@google.com>, Matt Giuca <mgiuca@chromium.org>, Jon Napper <napper@google.com>, Tom Buckley <tbuckley@google.com>
+Authors: 
+- Jiewei Qian <qjw@google.com>
+- Matt Giuca <mgiuca@google.com>
+- Jon Napper <napper@google.com>
+- Tom Buckley <tbuckley@google.com>
 
 ## Overview
 
@@ -288,7 +292,7 @@ We propose the following hint attributes:
     * `touch`: Input was made with touchscreen
     * `pen`: Input was made with stylus pen
     * `mouse`: Input was made with mouse
-* `textContext`: A string, the text that comes before the handwriting. This can be texts that were previously recognized, or were given as the writing context (e.g. "Write your name here:"). This is the linguistic context to help disambiguate the handwriting (e.g. “Hello <span style="text-decoration:underline;">world</span>” vs “Hello <span style="text-decoration:underline;">word</span>”).
+* `textContext`: A string, the text that comes before the handwriting. This can be texts that were previously recognized, or were given as the writing context (e.g. "Write your name here:"). This is the linguistic context to help disambiguate the handwriting (e.g. “Hello <span style="text-decoration:underline;">world</span>” vs. “Hello <span style="text-decoration:underline;">word</span>”).
 * `alternatives`: A number, the maximum number of alternative predictions.
 
 Hints won’t guarantee the result will satisfy these constraints. For example, proving the characters hint won’t guarantee the prediction result will only contain these characters.
@@ -331,7 +335,7 @@ Unicode combining marks are represented as a single code point. They are used to
 
 Handwriting recognition concerns with shape (input) and meaning (output). It’s important to distinguish between those two. For example, when requesting to recognize only certain characters, grapheme clusters should be used.
 
-### Ranking vs Score
+### Ranking vs. Score
 It’s very common to use a score for assessing alternative texts. This is commonly implemented in machine learning algorithms. However, it is not a good idea for the Web. 
 
 We expect different browser vendors to offer varying recognizer implementations, this will inevitably lead to the score being incomparable.
