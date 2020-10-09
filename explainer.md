@@ -5,37 +5,41 @@ Authors: Jiewei Qian <qjw@google.com>, Matt Giuca <mgiuca@chromium.org>, Jon Nap
 
 ## Overview
 
-Handwriting is a widely used input method, one key usage is to recognize the texts when users are drawing. This feature already exists on many operating systems (e.g. handwriting input methods). However, the web platform as of today can't tap into this capability. Developers need to integrate with third-party libraries (or cloud services), or to develop native apps.
+Handwriting is a widely used input method, one key usage is to recognize the texts when users are drawing. This feature already exists on many operating systems (e.g. handwriting input methods). However, the web platform as of today doesn’t have this capability, the developers need to integrate with third-party libraries (or cloud services), or to develop native apps.
 
-We want to add handwriting recognition capability to the web platform, so developers can use the it, which is readily available on the operating system.
+We want to add handwriting recognition capability to the web platform, so developers can use the existing handwriting recognition features available on the operating system.
 
-This document describes our proposal for a Web Platform API for performing on-line handwriting recognition from recorded real-time user inputs (e.g. touch, stylus). This API does not aim to support recognizing handwritings in images (off-line recognition).
-
-The term “on-line” means the API recognizes the text as the users are drawing them. Specifically, the handwriting contains temporal information (e.g. the pen-tip is at position A at time T). 
-
-The recognizer will be able to function without the Internet, but might make use of cloud services (if available) to improve the result.
-
-This API allow Web applications to:
-
-1. Collect some handwriting inputs (ink strokes)
-2. Request the user agent to recognize the texts
-3. Retrieve the result
-    *   Recognized texts as a JavaScript String
-    *   Optional: Alternative results
-    *   Optional: Extra information (e.g. character segmentation)
+This document describes our proposal for a Web Platform API for performing on-line handwriting recognition from recorded real-time user inputs (e.g. touch, stylus).  The term “on-line” means the API recognizes the text as the users are drawing them.
 
 
 ## Problem Description
 
 Conceptually, handwriting inputs are drawings. A drawing captures the information required to recreate a pen-tip movement for text recognition purposes. Take the handwritten “WEB” for example:
 
-![Handwriting Concept](images/handwriting-concept.svg)
+<img src="images/handwriting-concept.svg" style="width: 95% display: block; margin: 0 auto;" alt="Handwriting Concept"></img>
 
 *   A **drawing** consists of multiple ink strokes (e.g. the above letter E consists of three ink strokes).
 *   An **ink stroke** represents one continuous pen-tip movement that happens across some time period (e.g. from one `touchstart` to its corresponding `touchend` event). The movement trajectory is represented by a series of ink points.
 *   An **ink point** is an observation of the pen-tip in space and time. It records the timestamp and position of the pen-tip on the writing surface (e.g. a `touchmove` event).
 
-The job of a handwriting recognizer is to determine the text written in a drawing. 
+We want the handwriting API to enable web developers to fully utilize the capabilities available in common handwriting recognition libraries. The recognizer will need to:
+* Accept a vector representation of a drawing (described in the above picture).
+* Recognize texts as users are writing, in real-time (each recognition costs less than hundreds of milliseconds).
+* Not rely on the Internet (a note taking website should still work in flight mode). Though the recognizer can make use of cloud services if available.
+* Return the text that’s most likely written as a string.
+* Allow web developers to control or fine-tune the recognizer. For example, allow developers to specify the language (an English recognizer won’t recognize Chinese characters).
+* Offer an extensible way to add support for new features, in order to utilize the latest features available on the underlying libraries.
+* Provide a way for developers to query feature support, so developers can decide if the recognizer should be used in their app.
+
+To satisfy common use cases, the recognizer also need to:
+Return a list of alternatives (candidates) of the text.
+* Rank alternatives based on likelihood of being correct.
+* Return segmentation result for each character (or words). So clients can know which strokes (and points) make up a character. One use case is in note taking apps, users select recognized texts, and delete all strokes.
+
+Non-goals:
+* Design an API to recognize texts in static images. That is optical character recognition, and is better aligned with Shape Detection API.
+* Deliver consistent output across all platforms. This is very difficult, unless we implement a common (publicly owned) algorithm. Therefore, we allow the same drawing to yield different outputs. But we want to achieve a common output structure (e.g. what attribute A means, which attributes must be present).
+
 
 
 ## Existing APIs
@@ -299,6 +303,42 @@ A **prediction result** is a JavaScript object. It _must_ contain the text attri
 The prediction result _may_ contain (if the implementation choose to support):
 
 *   `alternatives`: A list of JavaScript objects, where each object has a text field. These are the next best predictions (alternatives), in decreasing confidence order. Up to a maximum of `alternatives `(given in hints) strings. For example, the first string is the second best prediction (the best being the prediction result).
+* `segmentationResult`: [TODO] Come up with a way to represent text segmentation.
+
+### Segmentation result
+[TODO] Come up with a way to represent grapheme set segmentation.
+
+[TODO] per character (grapheme set) segmentation vs. word (phrase) segmentation. Or make this configurable?
+
+<img src="images/segmentation-concept.svg" style="max-width: 40%; min-width: 300px; display: block; margin: 0 auto;" alt="Segmentation Concept"></img>
+
+## Design Questions
+### Why not use Web Assembly?
+Web Assembly would not allow the use of more advanced proprietary handwriting libraries (e.g. those available on the operating system). Web developers also need to manage distribution (and update) of such libraries (might take several megabytes for each update).
+
+Web API can do the same task more efficiently (better models, zero distribution cost, faster computation). This topic was previously discussed in Shape Detection API and Text-to-Speech API.
+
+
+### Why not use Shape Detection?
+Handwriting (in this proposal) includes temporal information (how the shape is drawn, pixel by pixel). We believe this additional temporal information distinguishes handwriting recognition from shape detection.
+
+If we take out the temporal information, the task becomes optical character recognition (given a photo of written characters). This is a different task, and indeed fits within the scope of shape detection.
+
+### Grapheme clusters vs. Unicode code points
+Grapheme clusters is the minimal unit used in writing. It represents visual shape. On the other hand, Unicode code points are a computer's internal representation. It represents meaning. The two concepts aren’t fully correlated.
+
+Unicode combining marks are represented as a single code point. They are used to modify other characters, but not by themselves. This creates a problem when we need to distinguish between shape and meaning. For example, letter a (U+0061) and grave accent combining mark (U+0300) combines to à. Letter न (U+0928) and combining mark  ि (U+093F) combines to letter नि.
+
+Handwriting recognition concerns with shape (input) and meaning (output). It’s important to distinguish between those two. For example, when requesting to recognize only certain characters, grapheme clusters should be used.
+
+### Ranking vs Score
+It’s very common to use a score for assessing alternative texts. This is commonly implemented in machine learning algorithms. However, it is not a good idea for the Web. 
+
+We expect different browser vendors to offer varying recognizer implementations, this will inevitably lead to the score being incomparable.
+
+Because the score is an implementation detail of machine learning models, the meaning of score changes if the model changes. Therefore, scores are not comparable unless everyone uses the same model.
+
+Thus, we choose to use ranking instead of score. This gives some indication on which alternative is better. This avoids the scenario where web developers misunderstand the score’s implication and try to compare scores across different libraries, or filtering results based on it.
 
 
 ## Considerations
