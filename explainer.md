@@ -9,7 +9,7 @@ Authors:
 
 ## Overview
 
-Handwriting is a widely used input method, one key usage is to recognize the texts when users are drawing. This feature already exists on many operating systems (e.g. handwriting input methods). However, the web platform as of today doesn’t have this capability, the developers need to integrate with third-party libraries (or cloud services), or to develop native apps.
+Handwriting is a widely used input method, one key usage is to recognize the texts when users are drawing. This feature already exists on many operating systems (e.g. handwriting input methods). However, the web platform as of today doesn't have this capability, the developers need to integrate with third-party libraries (or cloud services), or to develop native apps.
 
 We want to add handwriting recognition capability to the web platform, so developers can use the existing handwriting recognition features available on the operating system.
 
@@ -30,8 +30,8 @@ We want the handwriting API to enable web developers to fully utilize the capabi
 * Accept a vector representation of a drawing (described in the above picture).
 * Recognize texts as users are writing, in real-time (each recognition costs less than hundreds of milliseconds).
 * Not rely on the Internet (a note taking website should still work in flight mode). Though the recognizer can make use of cloud services if available.
-* Return the text that’s most likely written as a string.
-* Allow web developers to control or fine-tune the recognizer. For example, allow developers to specify the language (an English recognizer won’t recognize Chinese characters).
+* Return the text that's most likely written as a string.
+* Allow web developers to control or fine-tune the recognizer. For example, allow developers to specify the language (an English recognizer won't recognize Chinese characters).
 * Offer an extensible way to add support for new features, in order to utilize the latest features available on the underlying libraries.
 * Provide a way for developers to query feature support, so developers can decide if the recognizer should be used in their app.
 
@@ -94,14 +94,14 @@ PencilKit provides support for creating and managing ink drawings, key classes a
 *   `PKStroke` can be constructed by PKStrokePoints. It interpolates the points to form a smooth stroke path.
 *   `Ink` represents the styling of the stroke (i.e. width, color, type).
 
-Apple hasn’t disclosed a public API for online handwriting recognition. But iPadOS 14 has the capability to convert handwriting to text.
+Apple hasn't disclosed a public API for online handwriting recognition. But iPadOS 14 has the capability to convert handwriting to text.
 
 
 ### [MyScript](https://developer.myscript.com/)
 
 MyScript is a commercial cross-platform ink SDK. It runs on Windows, iOS, Android, and Web. It requires a subscription to use, and can perform on-device recognition or acts as a cloud service.
 
-MyScript doesn’t use the point abstraction. Instead, a stroke is represented as an object which stores separate lists for position, timestamp and pressure (all lists are of the same length).
+MyScript doesn't use the point abstraction. Instead, a stroke is represented as an object which stores separate lists for position, timestamp and pressure (all lists are of the same length).
 
 In the simplest form, MyScript takes an input in the following form:
 
@@ -162,10 +162,10 @@ navigator.queryHandwritingRecognizerSupport('supportedTypes')
 ```JavaScript
 // Optional hints to the recognizer.
 const optionalHints = {
-  languages: [‘zh-CN’, ‘en’],  // Languages, in order of precedence
-  recognitionType: ‘text’,     // The type of content to be recognized
-  inputType: ‘mouse’,          // Alternatively, “touch” or “pen”
-  textContext: ‘Hello, ’,      // The text before the first stroke
+  languages: ['zh-CN', 'en'],  // Languages, in order of precedence
+  recognitionType: 'text',     // The type of content to be recognized
+  inputType: 'mouse',          // Alternatively, “touch” or “pen”
+  textContext: 'Hello, ',      // The text before the first stroke
   alternatives: 5,
 }
 
@@ -175,14 +175,14 @@ const recognizer = await navigator.createHandwritingRecognizer({
 })
 
 // Start a new drawing. 
-// It’s okay to create multiple drawings from a single recognizer.
+// It's okay to create multiple drawings from a single recognizer.
 const drawing = recognizer.startDrawing()
 
 // Create a stroke and add points. 
 // The point dictionary is copied, and added to the stroke object.
 stroke.addPoint({ x: 84, y: 34, t: 959.685 }) 
 
-// We can say it’s a copy of dict
+// We can say it's a copy of dict
 // Add a stroke to the drawing.
 drawing.addStroke(stroke)
 
@@ -267,7 +267,7 @@ An **ink stroke** is represented by a JavaScript `HandwritingStroke` object, cre
 
 Points are added by calling `addPoint` method, which deep copies the provided point dictionary.
 
-A **drawing** is represented by a JavaScript `HandwritingDrawing` object, created by calling recognizer’s startDrawing method. The ink strokes _should_ be in an ascending order based on their start time (the `t` attribute of their first point).
+A **drawing** is represented by a JavaScript `HandwritingDrawing` object, created by calling recognizer's startDrawing method. The ink strokes _should_ be in an ascending order based on their start time (the `t` attribute of their first point).
 
 *   Strokes are added by calling `addStroke` method, which takes a `HandwritingStroke` object, and stores a reference to it.
 *   Strokes can be deleted by calling `removeStroke` method, which takes a previously added HandwritingStroke object.
@@ -281,8 +281,8 @@ Clients can optionally provide hints (or some combinations) when creating a `Han
 
 We propose the following hint attributes:
 
-* `languages`: A list of languages that the recognizer should attempt to recognize. Languages are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`). If there’s no dedicated models for that language tag, the recognizer falls back to the macro language (zh-CN becomes zh). If the macro language is not supported, the recognizer fall back to the default language of the browser (i.e. navigator.language).
-* `graphemeClusterSet`: A list of strings, each string represents a grapheme cluster (a user-visible character) that is most likely to be written. Note, this is a hint, it doesn’t guarantee that the recognizer only returns the characters specified here. Clients need to process the result if they want to filter-out unwanted characters.
+* `languages`: A list of languages that the recognizer should attempt to recognize. Languages are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`). If there's no dedicated models for that language tag, the recognizer falls back to the macro language (zh-CN becomes zh). If the macro language is not supported, the recognizer fall back to the default language of the browser (i.e. navigator.language).
+* `graphemeClusterSet`: A list of strings, each string represents a grapheme cluster (a user-visible character) that is most likely to be written. Note, this is a hint, it doesn't guarantee that the recognizer only returns the characters specified here. Clients need to process the result if they want to filter-out unwanted characters.
 * `recognitionType`: A string, the type of content to be recognized. The recognizer may use these to better rank the recognition results. It supports:
     * `email`: an email address
     * `number`: a decimal number
@@ -295,7 +295,7 @@ We propose the following hint attributes:
 * `textContext`: A string, the text that comes before the handwriting. This can be texts that were previously recognized, or were given as the writing context (e.g. "Write your name here:"). This is the linguistic context to help disambiguate the handwriting (e.g. “Hello <span style="text-decoration:underline;">world</span>” vs. “Hello <span style="text-decoration:underline;">word</span>”).
 * `alternatives`: A number, the maximum number of alternative predictions.
 
-Hints won’t guarantee the result will satisfy these constraints. For example, proving the characters hint won’t guarantee the prediction result will only contain these characters.
+Hints won't guarantee the result will satisfy these constraints. For example, proving the characters hint won't guarantee the prediction result will only contain these characters.
 
 ### The prediction result
 
@@ -329,20 +329,20 @@ Handwriting (in this proposal) includes temporal information (how the shape is d
 If we take out the temporal information, the task becomes optical character recognition (given a photo of written characters). This is a different task, and indeed fits within the scope of shape detection.
 
 ### Grapheme clusters vs. Unicode code points
-Grapheme clusters is the minimal unit used in writing. It represents visual shape. On the other hand, Unicode code points are a computer's internal representation. It represents meaning. The two concepts aren’t fully correlated.
+Grapheme clusters is the minimal unit used in writing. It represents visual shape. On the other hand, Unicode code points are a computer's internal representation. It represents meaning. The two concepts aren't fully correlated.
 
 Unicode combining marks are represented as a single code point. They are used to modify other characters, but not by themselves. This creates a problem when we need to distinguish between shape and meaning. For example, letter a (U+0061) and grave accent combining mark (U+0300) combines to à. Letter न (U+0928) and combining mark  ि (U+093F) combines to letter नि.
 
-Handwriting recognition concerns with shape (input) and meaning (output). It’s important to distinguish between those two. For example, when requesting to recognize only certain characters, grapheme clusters should be used.
+Handwriting recognition concerns with shape (input) and meaning (output). It's important to distinguish between those two. For example, when requesting to recognize only certain characters, grapheme clusters should be used.
 
 ### Ranking vs. Score
-It’s very common to use a score for assessing alternative texts. This is commonly implemented in machine learning algorithms. However, it is not a good idea for the Web. 
+It's very common to use a score for assessing alternative texts. This is commonly implemented in machine learning algorithms. However, it is not a good idea for the Web. 
 
 We expect different browser vendors to offer varying recognizer implementations, this will inevitably lead to the score being incomparable.
 
 Because the score is an implementation detail of machine learning models, the meaning of score changes if the model changes. Therefore, scores are not comparable unless everyone uses the same model.
 
-Thus, we choose to use ranking instead of score. This gives some indication on which alternative is better. This avoids the scenario where web developers misunderstand the score’s implication and try to compare scores across different libraries, or filtering results based on it.
+Thus, we choose to use ranking instead of score. This gives some indication on which alternative is better. This avoids the scenario where web developers misunderstand the score's implication and try to compare scores across different libraries, or filtering results based on it.
 
 
 ## Considerations
@@ -351,14 +351,14 @@ Thus, we choose to use ranking instead of score. This gives some indication on w
 
 The underlying handwriting recognition algorithm is a fingerprint vector, it could expose information about the device (e.g. operating system). However, this information is already available in the navigator object.
 
-The actual handwriting (of a user) is a good way of fingerprinting the user, but it is already available for collection using canvas, so we don’t think this API will expose additional vectors for fingerprinting the user.
+The actual handwriting (of a user) is a good way of fingerprinting the user, but it is already available for collection using canvas, so we don't think this API will expose additional vectors for fingerprinting the user.
 
 
 ### Language Handling
 
 For querying for supported languages, the implementation should only return the language tags that have dedicated (or fine-tuned) models. For example, if the implementation only has a generic English language model, it should only include "en" in supportedLanguages, even if this model works for its language variants (e.g. en-US).
 
-If language hints aren’t provided, this API should try to recognize texts based on `navigator.languages` or user's input methods.
+If language hints aren't provided, this API should try to recognize texts based on `navigator.languages` or user's input methods.
 
 Web developers may provide language subtags (e.g. region and script). The implementation should interpret these tags accordingly, and fallback to the macro language if necessary. For example, the "en-AU" language tag is interpreted as “en”, if there are no dedicated recognizers for Australian English.
 
@@ -378,7 +378,7 @@ The implementation may keep states about the texts already recognized and perfor
 
 Alternatively, the API could take in a complete drawing, recognizes the text, and returns the result. This is simpler to use, the disadvantage being:
 
-* It can’t support incremental recognition. Each time the recognizer is called, the complete drawing is processed, even if part of the drawing may already be processed previously.
+* It can't support incremental recognition. Each time the recognizer is called, the complete drawing is processed, even if part of the drawing may already be processed previously.
 * It causes more overhead if the recognizer is repeatedly called on incremental drawings (i.e. when new strokes are added to an existing drawing). The information in the existing drawing will be processed again, even if they were processed in previous recognition requests.
 
 ```JavaScript
@@ -386,7 +386,7 @@ Alternatively, the API could take in a complete drawing, recognizes the text, an
 
 const recognizer = await navigator.createHandwritingRecognizer({
   hints: {    // Optionally, provide some hints.
-    languages: [‘zh-CN’, ‘en’],
+    languages: ['zh-CN', 'en'],
   }
 })
 
@@ -400,8 +400,8 @@ const drawing = [
 // Optionally, include some hints.
 
 const optionalHints = {
-  inputType: ‘mouse’,   // Alternatively, “touch” or “pen”
-  textContext: ‘Hello, ’,   // The text before the first stroke
+  inputType: 'mouse',   // Alternatively, “touch” or “pen”
+  textContext: 'Hello, ',   // The text before the first stroke
   alternatives: 5,  
 }
 
