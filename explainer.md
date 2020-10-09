@@ -16,7 +16,7 @@ This document describes our proposal for a Web Platform API for performing on-li
 
 Conceptually, handwriting inputs are drawings. A drawing captures the information required to recreate a pen-tip movement for text recognition purposes. Take the handwritten “WEB” for example:
 
-<img src="images/handwriting-concept.svg" style="width: 95% display: block; margin: 0 auto;" alt="Handwriting Concept"></img>
+![Handwriting Concept](/images/handwriting-concept.svg)
 
 *   A **drawing** consists of multiple ink strokes (e.g. the above letter E consists of three ink strokes).
 *   An **ink stroke** represents one continuous pen-tip movement that happens across some time period (e.g. from one `touchstart` to its corresponding `touchend` event). The movement trajectory is represented by a series of ink points.
@@ -93,7 +93,7 @@ PencilKit provides support for creating and managing ink drawings, key classes a
 Apple hasn’t disclosed a public API for online handwriting recognition. But iPadOS 14 has the capability to convert handwriting to text.
 
 
-### [MyScript](https://developer.myscript.com/)  {#myscript}
+### [MyScript](https://developer.myscript.com/)
 
 MyScript is a commercial cross-platform ink SDK. It runs on Windows, iOS, Android, and Web. It requires a subscription to use, and can perform on-device recognition or acts as a cloud service.
 
@@ -153,12 +153,12 @@ navigator.queryHandwritingRecognizerSupport('supportedTypes')
 ```
 
 
-### Perform Recognition {#perform-recognition}
+### Perform Recognition
 
 ```JavaScript
 // Optional hints to the recognizer.
-const optionalHints = { \
-  languages: [‘zh-CN’, ‘en’],  // Languages, in order of precedence \
+const optionalHints = {
+  languages: [‘zh-CN’, ‘en’],  // Languages, in order of precedence
   recognitionType: ‘text’,     // The type of content to be recognized
   inputType: ‘mouse’,          // Alternatively, “touch” or “pen”
   textContext: ‘Hello, ’,      // The text before the first stroke
@@ -310,7 +310,7 @@ The prediction result _may_ contain (if the implementation choose to support):
 
 [TODO] per character (grapheme set) segmentation vs. word (phrase) segmentation. Or make this configurable?
 
-<img src="images/segmentation-concept.svg" style="max-width: 40%; min-width: 300px; display: block; margin: 0 auto;" alt="Segmentation Concept"></img>
+<img src="images/segmentation-concept.svg" width="400" alt="Segmentation Concept">
 
 ## Design Questions
 ### Why not use Web Assembly?
@@ -381,8 +381,8 @@ Alternatively, the API could take in a complete drawing, recognizes the text, an
 // Create a handwriting recognizer.
 
 const recognizer = await navigator.createHandwritingRecognizer({
-  hints: {    // Optionally, provide some hints. \
-    languages: [‘zh-CN’, ‘en’], \
+  hints: {    // Optionally, provide some hints.
+    languages: [‘zh-CN’, ‘en’],
   }
 })
 
