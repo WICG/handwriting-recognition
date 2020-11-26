@@ -281,7 +281,7 @@ Clients can optionally provide hints (or some combinations) when creating a `Han
 
 We propose the following hint attributes:
 
-* `languages`: A list of languages that the recognizer should attempt to recognize. Languages are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`). If there's no dedicated models for that language tag, the recognizer falls back to the macro language (zh-CN becomes zh). If the macro language is not supported, the recognizer fall back to the default language of the browser (i.e. navigator.language).
+* `languages`: A list of languages that the recognizer should attempt to recognize. Languages are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
 * `graphemeClusterSet`: A list of strings, each string represents a grapheme cluster (a user-visible character) that is most likely to be written. Note, this is a hint, it doesn't guarantee that the recognizer only returns the characters specified here. Clients need to process the result if they want to filter-out unwanted characters.
 * `recognitionType`: A string, the type of content to be recognized. The recognizer may use these to better rank the recognition results. It supports:
     * `email`: an email address
@@ -360,7 +360,14 @@ For querying for supported languages, the implementation should only return the 
 
 If language hints aren't provided, this API should try to recognize texts based on `navigator.languages` or user's input methods.
 
-Web developers may provide language subtags (e.g. region and script). The implementation should interpret these tags accordingly, and fallback to the macro language if necessary. For example, the "en-AU" language tag is interpreted as “en”, if there are no dedicated recognizers for Australian English.
+Web developers may provide language subtags (e.g. region and script). The implementation should interpret these tags accordingly, and choose fallbacks if necessary.
+
+In general, language fallbacks are:
+
+* If only the region subtag is provided (e.g. `zh-CN`), the recognizer tries the most prominent script for that region (e.g. `zh-CN` falls back to `zh-Hans`).
+* If there's no dedicated models for that script, the recognizer falls back to the macro language (`zh-Hans` falls back to `zh`).
+* If the macro language is not supported, the recognizer falls back to the default language of the browser (i.e. `navigator.language`).
+* If the default language is not supported, the recognizer should return `null` as the prediction result.
 
 
 ### Interoperability 
