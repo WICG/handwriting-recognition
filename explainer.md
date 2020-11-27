@@ -234,7 +234,7 @@ Conventionally,
 
 For example, these queries are supported in this proposal: 
 
-* `graphemeClusterSet`
+* `graphemeSet`
 * `alternatives`
 * `textContext`
 * `supportedLanguages`
@@ -282,7 +282,7 @@ Clients can optionally provide hints (or some combinations) when creating a `Han
 We propose the following hint attributes:
 
 * `languages`: A list of languages that the recognizer should attempt to recognize. Languages are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
-* `graphemeClusterSet`: A list of strings, each string represents a grapheme cluster (a user-visible character) that is most likely to be written. Note, this is a hint, it doesn't guarantee that the recognizer only returns the characters specified here. Clients need to process the result if they want to filter-out unwanted characters.
+* `graphemeSet`: A list of strings, each string represents a grapheme (a user-perceived unit of the orthography) that is most likely to be written. Note, this is a hint, it doesn't guarantee that the recognizer only returns the characters specified here. Clients need to process the result if they want to filter-out unwanted characters.
 * `recognitionType`: A string, the type of content to be recognized. The recognizer may use these to better rank the recognition results. It supports:
     * `email`: an email address
     * `number`: a decimal number
@@ -328,12 +328,12 @@ Handwriting (in this proposal) includes temporal information (how the shape is d
 
 If we take out the temporal information, the task becomes optical character recognition (given a photo of written characters). This is a different task, and indeed fits within the scope of shape detection.
 
-### Grapheme clusters vs. Unicode code points
-Grapheme clusters is the minimal unit used in writing. It represents visual shape. On the other hand, Unicode code points are a computer's internal representation. It represents meaning. The two concepts aren't fully correlated.
+### Grapheme vs. Unicode code points
+Grapheme is the minimal unit used in writing. It represents visual shape. On the other hand, Unicode code points are a computer's internal representation. It represents meaning. The two concepts aren't fully correlated.
 
 Unicode combining marks are represented as a single code point. They are used to modify other characters, but not by themselves. This creates a problem when we need to distinguish between shape and meaning. For example, letter a (U+0061) and grave accent combining mark (U+0300) combines to à. Letter न (U+0928) and combining mark  ि (U+093F) combines to letter नि.
 
-Handwriting recognition concerns with shape (input) and meaning (output). It's important to distinguish between those two. For example, when requesting to recognize only certain characters, grapheme clusters should be used.
+Handwriting recognition concerns with shape (input) and meaning (output). It's important to distinguish between those two. For example, when requesting to recognize only certain characters, graphemes should be used.
 
 ### Ranking vs. Score
 It's very common to use a score for assessing alternative texts. This is commonly implemented in machine learning algorithms. However, it is not a good idea for the Web. 
