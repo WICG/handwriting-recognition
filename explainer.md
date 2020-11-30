@@ -329,11 +329,11 @@ For example, an implementation with segmentation support returns
 
 
 ### Segmentation result
-Segmentation result is a mapping from recognized grapheme clusters to their composing strokes and points. This provides per-character editing functionality (e.g. delete this handwriting character in a note taking app).
+Segmentation result is a mapping from recognized graphemes to their composing strokes and points. This provides per-character editing functionality (e.g. delete this handwriting character in a note taking app).
 
-The segmentation result is a partition of the drawing: every point is attributed to exactly one grapheme cluster.
+The segmentation result is a partition of the drawing: every point is attributed to exactly one grapheme.
 
-In JavaScript, segmentation result is represented as a list. Each list item describes a grapheme cluster, its position in the predicted text, and its composing segments. Each segment is represented as a stroke object and its begin-end point indices.
+In JavaScript, segmentation result is represented as a list. Each list item describes a grapheme, its position in the predicted text, and its composing segments. Each segment is represented as a stroke object and its begin-end point indices.
 
 For example, the handwriting "int" produces a segmentation result like this:
 
@@ -342,18 +342,18 @@ For example, the handwriting "int" produces a segmentation result like this:
 ```JavaScript
 [
   {
-    // The string representation of this grapheme cluster.
-    graphemeCluster: "i",
+    // The string representation of this grapheme.
+    grapheme: "i",
 
-    // The position of this grapheme cluster in the predicted text.
-    // predictionResult.text.slice(beginIndex, endIndex) === graphemeCluster
+    // The position of this grapheme in the predicted text.
+    // predictionResult.text.slice(beginIndex, endIndex) === grapheme
     //
-    // If the grapheme cluster spans multiple Unicode code points,
+    // If the grapheme spans multiple Unicode code points,
     // `endIndex - beginIndex` is greater than 1.
     beginIndex: 0,
     endIndex: 1,
 
-    // Drawing segments that make up the grapheme cluster.
+    // Drawing segments that make up the grapheme.
     segments: [
       {
         stroke: handwritingStroke1,
@@ -368,7 +368,7 @@ For example, the handwriting "int" produces a segmentation result like this:
     ],
   },
   {
-    graphemeCluster: "n",
+    grapheme: "n",
     segments: [...],
   },
   ...
