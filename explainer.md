@@ -360,15 +360,11 @@ For querying for supported languages, the implementation should only return the 
 
 If language hints aren't provided, this API should try to recognize texts based on `navigator.languages` or user's input methods.
 
-Web developers may provide language subtags (e.g. region and script). The implementation should interpret these tags accordingly, and choose fallbacks if necessary.
+Web developers may provide subtags (e.g. region and script). The implementation should interpret them, and choose fallbacks if necessary. In general:
 
-In general, language fallbacks are:
-
-* If only the region subtag is provided (e.g. `zh-CN`), the recognizer tries the most prominent script for that region (e.g. `zh-CN` falls back to `zh-Hans`).
-* If there's no dedicated models for that script, the recognizer falls back to the macro language (`zh-Hans` falls back to `zh`).
-* If the macro language is not supported, the recognizer falls back to the default language of the browser (i.e. `navigator.language`).
-* If the default language is not supported, the recognizer should return `null` as the prediction result.
-
+* If the provided language tag doesn't match any recognizer, remove the last subtag until there is a match. For example, "zh-Hans-CN" -> "zh-Hans" -> "zh".
+* If the language subtag (e.g. zh) doesn't match any recognizer, fall back to browser's default language (i.e. `navigator.language`).
+* If the browser's default language isn't supported, the recognizer returns `null` for all prediction results.
 
 ### Interoperability 
 
