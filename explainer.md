@@ -240,6 +240,7 @@ For example, these queries are supported in this proposal:
 * `supportedLanguages`
 * `supportedRecognitionTypes`
 * `supportedInputTypes`
+* `segmentationResult`
 
 ### Coordinates
 
@@ -304,17 +305,80 @@ A **prediction result** is a JavaScript object. It _must_ contain the text attri
 *   `text`: string, the best prediction of texts drawn in the digital ink
 
 
-The prediction result _may_ contain (if the implementation choose to support):
+The prediction result _may_ contain additional attributes (if the implementation supports them):
 
-*   `alternatives`: A list of JavaScript objects, where each object has a text field. These are the next best predictions (alternatives), in decreasing confidence order. Up to a maximum of `alternatives `(given in hints) strings. For example, the first string is the second best prediction (the best being the prediction result).
-* `segmentationResult`: [TODO] Come up with a way to represent text segmentation.
+*   `alternatives`: A list of JavaScript objects. These are the next best predictions, ordered in decreasing confidence. Up to the maximum of `alternatives` (given in hints).
+    *   Each alternative object has a `text` field, representing the recognized text.
+    *   Extra (optional) return attributes uses the same name as the prediction result.
+*   `segmentationResult`: A list of JavaScript objects, explained in the below [Segmentation Result](#segmentation-result) section.
+
+
+For example, an implementation with segmentation support returns
+
+```JavaScript
+{
+  text: "best prediction",
+  segmentationResult: [...],
+  alternatives: [
+    { text: "2nd best prediction", segmentationResult: [...] },
+    { text: "3rd best prediction", segmentationResult: [...] },
+    ...
+  ]
+}
+```
+
 
 ### Segmentation result
-[TODO] Come up with a way to represent grapheme set segmentation.
+Segmentation result is a mapping from recognized graphemes to their composing strokes and points. This provides per-character editing functionality (e.g. delete this handwriting character in a note taking app).
 
-[TODO] per character (grapheme set) segmentation vs. word (phrase) segmentation. Or make this configurable?
+The segmentation result is a partition of the drawing: every point is attributed to exactly one grapheme.
+
+In JavaScript, segmentation result is represented as a list. Each list item describes a grapheme, its position in the predicted text, and its composing segments. Each segment is represented as a stroke object and its begin-end point indices.
+
+For example, the handwriting "int" produces a segmentation result like this:
 
 <img src="images/segmentation-concept.svg" width="400" alt="Segmentation Concept">
+
+```JavaScript
+[
+  {
+    // The string representation of this grapheme.
+    grapheme: "i",
+
+    // The position of this grapheme in the predicted text.
+    // predictionResult.text.slice(beginIndex, endIndex) === grapheme
+    //
+    // If the grapheme spans multiple Unicode code points,
+    // `endIndex - beginIndex` is greater than 1.
+    beginIndex: 0,
+    endIndex: 1,
+
+    // Drawing segments that make up the grapheme.
+    segments: [
+      {
+        stroke: handwritingStroke1,
+        beginPointIndex: 0,
+        endPointIndex: 30,
+      },
+      {
+        stroke: handwritingStroke5,
+        beginPointIndex: 0,
+        endPointIndex: 5,
+      }
+    ],
+  },
+  {
+    grapheme: "n",
+    segments: [...],
+  },
+  ...
+]
+```
+
+The handwriting stroke objects returned in the `segments` field is the exact same object passed to `drawing.addStroke()` (the identity operator `===` returns true).
+
+Whitespaces are not included in the segmentation result, even if they are part of the predicted text.
+
 
 ## Design Questions
 ### Why not use Web Assembly?
