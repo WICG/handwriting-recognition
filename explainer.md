@@ -329,7 +329,7 @@ For example, an implementation with segmentation support returns
 
 
 ### Segmentation result
-Segmentation result is a mapping from recognized graphemes to their composing strokes and points. This provides per-character editing functionality (e.g. delete this handwriting character in a note taking app).
+Segmentation result is a mapping from recognized graphemes (user-perceived characters) to their composing strokes and points. This provides per-character editing functionality (e.g. delete this handwriting character in a note taking app).
 
 The segmentation result is a partition of the drawing: every point is attributed to exactly one grapheme.
 
@@ -378,6 +378,8 @@ For example, the handwriting "int" produces a segmentation result like this:
 The handwriting stroke objects returned in the `segments` field is the exact same object passed to `drawing.addStroke()` (the identity operator `===` returns true).
 
 Whitespaces are not included in the segmentation result, even if they are part of the predicted text.
+
+In most languages, a grapheme (a user-perceived unit of orthography) corresponds to a Unicode grapheme cluster. For example, in Latin alphabet, grapheme "a" corresponds to grapheme cluster `U+0061`; "ä" corresponds to grapheme cluster `U+0061 U+0308`. In some complex scripts, some graphemes are composed of multiple grapheme clusters. For example, in Balinese, ᬓ᭄ᬱᭀ is made up of two Unicode grapheme clusters: `U+1B13` and `U+1B44 U+1B31 U+1B40`.
 
 
 ## Design Questions
