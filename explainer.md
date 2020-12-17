@@ -143,16 +143,16 @@ MyScript also provides helper classes and SDKs to manage stroke capture. Applica
 Handwriting recognizers on different platforms have different features. Web applications can query their feature support and decide if the API is suitable for their use case.
 
 ```JavaScript
-navigator.queryHandwritingRecognizerSupport('writingArea')
+await navigator.queryHandwritingRecognizerSupport('writingArea')
 // => true
 
-navigator.queryHandwritingRecognizerSupport('alternatives')
+await navigator.queryHandwritingRecognizerSupport('alternatives')
 // => true
 
-navigator.queryHandwritingRecognizerSupport('supportedLanguages')
+await navigator.queryHandwritingRecognizerSupport('supportedLanguages')
 // => ['en', 'zh']
 
-navigator.queryHandwritingRecognizerSupport('supportedTypes')
+await navigator.queryHandwritingRecognizerSupport('supportedTypes')
 // => ['text', 'number']
 ```
 
