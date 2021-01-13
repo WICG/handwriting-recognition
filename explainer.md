@@ -1,7 +1,7 @@
 
-# Handwriting Recognition Explainer 
+# Handwriting Recognition Explainer
 
-Authors: 
+Authors:
 - Jiewei Qian <qjw@google.com>
 - Matt Giuca <mgiuca@google.com>
 - Jon Napper <napper@google.com>
@@ -69,7 +69,7 @@ InkStroke stroke = (new InkStrokeBuilder()).CreateStroke([
 ]);
 
 // Collect some strokes.
-InkStroke strokes = [stroke, ...]; 
+InkStroke strokes = [stroke, ...];
 
 InkAnalyzer analyzer = new InkAnalyzer();
 analyzer.AddDataForStrokes([inkStroke, ...]);
@@ -174,13 +174,13 @@ const recognizer = await navigator.createHandwritingRecognizer({
     hints: optionalHints,
 })
 
-// Start a new drawing. 
+// Start a new drawing.
 // It's okay to create multiple drawings from a single recognizer.
 const drawing = recognizer.startDrawing()
 
-// Create a stroke and add points. 
+// Create a stroke and add points.
 // The point dictionary is copied, and added to the stroke object.
-stroke.addPoint({ x: 84, y: 34, t: 959.685 }) 
+stroke.addPoint({ x: 84, y: 34, t: 959.685 })
 
 // We can say it's a copy of dict
 // Add a stroke to the drawing.
@@ -191,7 +191,7 @@ stroke.addPoint({ x: 93, y: 54, t: 1013.685 })
 
 // Get predictions of the partial drawing.
 // This will take into account both points that were added to the stroke.
-await drawing.getPrediction() 
+await drawing.getPrediction()
 // => { text, boundingBox, candidates }
 
 // Add a new stroke.
@@ -201,7 +201,7 @@ drawing.addStroke(stroke2)
 
 // Get all strokes. Return a list of previously added HandwritingStroke object
 // references, in the same order as they were added.
-drawing.getStrokes() 
+drawing.getStrokes()
 // => [stroke, stroke2]
 
 // Delete a previous stroke.
@@ -224,7 +224,7 @@ Handwriting recognition can be implemented in different ways. We expect differen
 
 The `queryHandwritingRecognizerSupport` method allows Web developers to query implementation-specific features, decide whether handwriting recognition is supported, and whether it is suitable for their use case.
 
-This method takes the query as a string, and returns the appropriate result. 
+This method takes the query as a string, and returns the appropriate result.
 
 Conventionally,
 
@@ -232,7 +232,7 @@ Conventionally,
 *   For features expecting a structured value (e.g. size of writing area), the query string is the feature name (i.e. the attribute name in the hint object). The method returns `true` if this feature is supported.
 *   For unsupported features, the method returns `null`.
 
-For example, these queries are supported in this proposal: 
+For example, these queries are supported in this proposal:
 
 * `graphemeSet`
 * `alternatives`
@@ -402,7 +402,7 @@ Unicode combining marks are represented as a single code point. They are used to
 Handwriting recognition concerns with shape (input) and meaning (output). It's important to distinguish between those two. For example, when requesting to recognize only certain characters, graphemes should be used.
 
 ### Ranking vs. Score
-It's very common to use a score for assessing alternative texts. This is commonly implemented in machine learning algorithms. However, it is not a good idea for the Web. 
+It's very common to use a score for assessing alternative texts. This is commonly implemented in machine learning algorithms. However, it is not a good idea for the Web.
 
 We expect different browser vendors to offer varying recognizer implementations, this will inevitably lead to the score being incomparable.
 
@@ -432,7 +432,7 @@ Web developers may provide subtags (e.g. region and script). The implementation 
 * If the language subtag (e.g. zh) doesn't match any recognizer, fall back to browser's default language (i.e. `navigator.language`).
 * If the browser's default language isn't supported, the recognizer returns `null` for all prediction results.
 
-### Interoperability 
+### Interoperability
 
 This API aims to find the "greatest common divisor" of major platforms. The input to handwriting recognizer function should be easily translated to the input required by the underlying handwriting recognition API (available on the operating system).
 
@@ -471,14 +471,14 @@ const drawing = [
 const optionalHints = {
   inputType: 'mouse',   // Alternatively, “touch” or “pen”
   textContext: 'Hello, ',   // The text before the first stroke
-  alternatives: 5,  
+  alternatives: 5,
 }
 
 // Recognize the text.
 const result = recognizer.recognize(drawing, optionalHints)
 // => The result object:
 //   {
-//     text: “best prediction”, 
+//     text: “best prediction”,
 //     boundingBox: { x, y, width, height },
 //     alternatives: [
 //       { text: “second best”} },
