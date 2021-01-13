@@ -160,23 +160,27 @@ await navigator.queryHandwritingRecognizerSupport('supportedTypes')
 ### Perform Recognition
 
 ```JavaScript
-// Optional hints to the recognizer.
-const optionalHints = {
+// Model constraints determine the handwriting recognition model
+// used to create the recognizer.
+const modelConstraints = {
   languages: ['zh-CN', 'en'],  // Languages, in order of precedence
-  recognitionType: 'text',     // The type of content to be recognized
-  inputType: 'mouse',          // Alternatively, “touch” or “pen”
-  textContext: 'Hello, ',      // The text before the first stroke
-  alternatives: 5,
 }
 
 // Create a handwriting recognizer.
-const recognizer = await navigator.createHandwritingRecognizer({
-    hints: optionalHints,
-})
+const recognizer = await navigator.createHandwritingRecognizer(modelConstraints)
+
+// Optional hints to improve recognizer's performance on a drawing.
+const optionalHints = {
+  recognitionType: 'text',   // The type of content to be recognized
+  inputType: 'mouse',        // Alternatively, “touch” or “pen”
+  textContext: 'Hello, ',    // The text before the first stroke
+  alternatives: 5,
+}
 
 // Start a new drawing.
-// It's okay to create multiple drawings from a single recognizer.
-const drawing = recognizer.startDrawing()
+// Multiple drawings can be created from a single recognizer. They
+// can have different hints.
+const drawing = recognizer.startDrawing(optionalHints)
 
 // Create a stroke and add points.
 // The point dictionary is copied, and added to the stroke object.
@@ -220,7 +224,7 @@ await drawing.finish()
 
 ### Feature Detection
 
-Handwriting recognition can be implemented in different ways. We expect different implementations will support different features (and hints).
+Handwriting recognition can be implemented in different ways. We expect different implementations to different sets of features (and hints).
 
 The `queryHandwritingRecognizerSupport` method allows Web developers to query implementation-specific features, decide whether handwriting recognition is supported, and whether it is suitable for their use case.
 
@@ -273,16 +277,29 @@ A **drawing** is represented by a JavaScript `HandwritingDrawing` object, create
 *   Strokes are added by calling `addStroke` method, which takes a `HandwritingStroke` object, and stores a reference to it.
 *   Strokes can be deleted by calling `removeStroke` method, which takes a previously added HandwritingStroke object.
 
+### Model constraints
+
+Model constraints are used to determine and initialize the underlying handwriting recognition algorithm. They describes a set of constraints that the created recognizer must satisfy.
+
+Model constraints can be empty. In this case, the browser is free to choose a default (e.g. based on `navigator.languages`).
+
+`createHandwritingRecognizer` throws an `Error` if:
+* The provided constraints can't be satisfied (e.g. the browser has no model for the chosen language)
+* There isn't enough resource to initialize a recognizer (e.g. out of memory)
+
+We propose the following model option:
+
+* `languages`: A list of languages that the recognizer should attempt to recognize. They are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
+
 
 ### Recognition hints
 
-The recognizer _may_ accept hints to improve accuracy.
+The recognizer _may_ accept hints to improve accuracy for each drawing.
 
 Clients can optionally provide hints (or some combinations) when creating a `HandwritingRecognizer` object. Providing unsupported hints has no effect.
 
 We propose the following hint attributes:
 
-* `languages`: A list of languages that the recognizer should attempt to recognize. Languages are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
 * `graphemeSet`: A list of strings, each string represents a grapheme (a user-perceived unit of the orthography) that is most likely to be written. Note, this is a hint, it doesn't guarantee that the recognizer only returns the characters specified here. Clients need to process the result if they want to filter-out unwanted characters.
 * `recognitionType`: A string, the type of content to be recognized. The recognizer may use these to better rank the recognition results. It supports:
     * `email`: an email address
@@ -424,13 +441,32 @@ The actual handwriting (of a user) is a good way of fingerprinting the user, but
 
 For querying for supported languages, the implementation should only return the language tags that have dedicated (or fine-tuned) models. For example, if the implementation only has a generic English language model, it should only include "en" in supportedLanguages, even if this model works for its language variants (e.g. en-US).
 
-If language hints aren't provided, this API should try to recognize texts based on `navigator.languages` or user's input methods.
-
 Web developers may provide subtags (e.g. region and script). The implementation should interpret them, and choose fallbacks if necessary. In general:
 
-* If the provided language tag doesn't match any recognizer, remove the last subtag until there is a match. For example, "zh-Hans-CN" -> "zh-Hans" -> "zh".
-* If the language subtag (e.g. zh) doesn't match any recognizer, fall back to browser's default language (i.e. `navigator.language`).
-* If the browser's default language isn't supported, the recognizer returns `null` for all prediction results.
+* If the provided language tag doesn't match any recognizer, remove the last subtag until there is a match. For example, `"zh-Hans-CN"` -> `"zh-Hans"` -> `"zh"`.
+* If the browser can't match any recognizer (after the above fallbacks), `createHandwritingRecognizer` method throws an Error.
+
+If language model options aren't provided, this implementation should try to pick a model based on `navigator.languages` or user's input methods. If this fails to match any recognizer, `createHandwritingRecognizer` method throws an Error.
+
+### Model Constraints vs. Model Identifier
+In the current design, `createHandwritingRecognizer` takes model constraints, and let the browser to determine the exact recognition models being used.
+
+This offload some work for Web developers. Developers don't have to write logics to pick a specific model (e.g. parse language tags, decide fallbacks, etc.) from a list of supported models.
+
+At early design stages, we are unsure if requiring web applications to explicitly pick a model is a good idea (or ergonomic for web developers). We'd need developer feedbacks to better decide this.
+
+The current design (of using model constraints) has room for a future addition `modelIdentifier` field. This would work similarly to Web Speech Synthesis API, where the web application explicitly chooses a voice.
+
+* `queryHandwritingRecognizerSupport` would have a `supportedModels` query. It returns a JavaScript object describing the characteristics of the available models.
+    ````JavaScript
+    {
+      identifier: 'zh-Hani',
+      languages: ['zh'],
+      offlineService: true,
+      ... /* Attributes may vary based on platform */
+    }
+    ````
+* `modelIdentifier` is mutually exclusive with other model constraints. If it's used with any other constraint, `createHandwritingRecognizer` will throw an Error.
 
 ### Interoperability
 
@@ -454,9 +490,8 @@ Alternatively, the API could take in a complete drawing, recognizes the text, an
 // Create a handwriting recognizer.
 
 const recognizer = await navigator.createHandwritingRecognizer({
-  hints: {    // Optionally, provide some hints.
-    languages: ['zh-CN', 'en'],
-  }
+  languages: ['zh-CN', 'en'],
+  // Optionally, provide more hints.
 })
 
 // Collect a drawing (list of strokes).
