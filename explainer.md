@@ -214,9 +214,12 @@ drawing.removeStroke(stroke)
 // Get a new prediction.
 await drawing.getPrediction()
 
-// Complete the drawing and free up resources. Subsequent calls on the drawing
-// object will throw an error.
-await drawing.finish()
+// Clear all the strokes.
+drawing.clear()
+
+// Complete the recognition and free up resources. Subsequent calls on the 
+// corresponding drawing object will throw an error.
+await recognizer.finish()
 ```
 
 
