@@ -182,6 +182,9 @@ const optionalHints = {
 // can have different hints.
 const drawing = recognizer.startDrawing(optionalHints)
 
+// Create a new stroke.
+const stroke = new HandwritingStroke()
+
 // Create a stroke and add points.
 // The point dictionary is copied, and added to the stroke object.
 stroke.addPoint({ x: 84, y: 34, t: 959.685 })
