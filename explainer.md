@@ -143,17 +143,19 @@ MyScript also provides helper classes and SDKs to manage stroke capture. Applica
 Handwriting recognizers on different platforms have different features. Web applications can query their feature support and decide if the API is suitable for their use case.
 
 ```JavaScript
-await navigator.queryHandwritingRecognizerSupport('writingArea')
-// => true
+// The list of features to detect.
+await navigator.queryHandwritingRecognizerSupport([
+  'alternatives',
+  'languages',
+  'unsupportedFeature',
+])
 
-await navigator.queryHandwritingRecognizerSupport('alternatives')
-// => true
-
-await navigator.queryHandwritingRecognizerSupport('supportedLanguages')
-// => ['en', 'zh']
-
-await navigator.queryHandwritingRecognizerSupport('supportedTypes')
-// => ['text', 'number']
+// Returns a dictionary for each query provided in the above call.
+// => {
+//   alternatives: true,     // supports alternative results
+//   languages: ['en', 'zh-CN'],    // list of supported languages
+//   unsupportedFeature: null,    // null for unsupported features
+// }
 ```
 
 
@@ -224,22 +226,18 @@ Handwriting recognition can be implemented in different ways. We expect differen
 
 The `queryHandwritingRecognizerSupport` method allows Web developers to query implementation-specific features, decide whether handwriting recognition is supported, and whether it is suitable for their use case.
 
-This method takes the query as a string, and returns the appropriate result.
+This method takes the query array, where each array element is a feature name (query). This method returns a dictionary, whose keys are the provided feature names, and the values are some information about the feature.
 
-Conventionally,
+Conventionally, feature name is the same as the key name used in method arguments or outputs. If a feature name is not supported, the value (for that key-value pair) is `null`.
 
-*   For features expecting an enumerated list (e.g. language), the query is prefixed with "supported" to the feature name. The method returns a list of values for developers to choose from.
-*   For features expecting a structured value (e.g. size of writing area), the query string is the feature name (i.e. the attribute name in the hint object). The method returns `true` if this feature is supported.
-*   For unsupported features, the method returns `null`.
-
-For example, these queries are supported in this proposal:
+For example, these feature names are supported in this proposal:
 
 * `graphemeSet`
 * `alternatives`
 * `textContext`
-* `supportedLanguages`
-* `supportedRecognitionTypes`
-* `supportedInputTypes`
+* `languages`
+* `recognitionTypes`
+* `inputTypes`
 * `segmentationResult`
 
 ### Coordinates
