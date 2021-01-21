@@ -144,19 +144,30 @@ Handwriting recognizers on different platforms have different features. Web appl
 
 ```JavaScript
 // The list of features to detect.
-await navigator.queryHandwritingRecognizerSupport([
-  'alternatives',
-  'languages',
-  'unsupportedFeature',
-])
+await navigator.queryHandwritingRecognizerSupport({
+  'languages': ['en', 'zh-CN']  // A list of languages
+  'alternatives': true          // Can be any value
+  'unsupportedFeature': true    // Can be any value
+})
 
-// Returns a dictionary for each query provided in the above call.
+// Returns true for each supported feature query, false otherwise.
 // => {
-//   alternatives: true,     // supports alternative results
-//   languages: ['en', 'zh-CN'],    // list of supported languages
-//   unsupportedFeature: null,    // null for unsupported features
+//   languages: true,  // The recognizer supports both en and zh-CN
+//   alternatives: true,
+//   unsupportedFeature: false
 // }
 ```
+
+To mitigate passive fingerprinting, `queryHandwritingRecognizerSupport` may throw an Error if the website issues too many queries (e.g. when trying to enumerate all supported languages). The browser may show a permission prompt and ask if user grants access to unrestricted handwriting recognition features (before throwing the Error).
+
+**TODO: ** Figure out a suitable privacy protection for `getPrediction()` (or `createHandwritingRecognizer()`).
+- Gate it behind a one-off permission prompt. Go head with this, until we see sufficient interest of using this API without permission prompts.
+- Require handwritings to be composed of user action (e.g. event.isTrusted) only.
+- Mix of both? We can have two types of drawings?
+  - One accepts arbitrary points (`{x,y,t}`)
+  - One only accepts certain events (`mousemove`, `touchmove`), and is constructed with a writing area bounding box.
+
+**TODO: ** Update the fingerprint section.
 
 
 ### Perform Recognition
