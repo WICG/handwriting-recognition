@@ -169,12 +169,12 @@ const modelConstraints = {
 // Create a handwriting recognizer.
 const recognizer = await navigator.createHandwritingRecognizer(modelConstraints)
 
-// Optional hints to improve recognizer's performance on a drawing.
+// Optional hints to improve recognizer's performance on a drawing
 const optionalHints = {
   recognitionType: 'text',   // The type of content to be recognized
   inputType: 'mouse',        // Alternatively, “touch” or “pen”
   textContext: 'Hello, ',    // The text before the first stroke
-  alternatives: 5,
+  alternatives: 3,           // How many alternative results to return
 }
 
 // Start a new drawing.
@@ -208,7 +208,20 @@ stroke.addPoint({ x: 93, y: 54, t: 1013 })
 // Get predictions of the partial drawing.
 // This will take into account both points that were added to the stroke.
 await drawing.getPrediction()
-// => { text, boundingBox, candidates }
+
+// The returne value is a list of prediction results, in decreasing
+// order of confidence (of that result being correct).
+//
+// The list is guaranteed to have at least one result.
+//
+// Each result may contain extra fields, if the recognizer supports
+// returning these information. For example, segmentation results.
+//
+// => [
+//   { text: "predicted text", /* extra fields */ },
+//   { text: "...", /* extra fields */  }
+// ]
+
 
 // Add a new stroke.
 const stroke2 = new HandwritingStroke()
@@ -331,29 +344,26 @@ Hints won't guarantee the result will satisfy these constraints. For example, pr
 
 A **prediction result** is a JavaScript object. It _must_ contain the text attribute:
 
-*   `text`: string, the best prediction of texts drawn in the digital ink
+*   `text`: string, the texts drawn in the digital ink
 
+A prediction result _may_ contain additional attributes (if the implementation supports their respective features):
 
-The prediction result _may_ contain additional attributes (if the implementation supports them):
-
-*   `alternatives`: A list of JavaScript objects. These are the next best predictions, ordered in decreasing confidence. Up to the maximum of `alternatives` (given in hints).
-    *   Each alternative object has a `text` field, representing the recognized text.
-    *   Extra (optional) return attributes uses the same name as the prediction result.
 *   `segmentationResult`: A list of JavaScript objects, explained in the below [Segmentation Result](#segmentation-result) section.
 
+
+`getPrediction()` method returns a list of prediction results, in decreasing order of confidence (e.g. the first result is the best prediction).
+
+*   This list must have at least one prediction result.
+*   If the recognizer supports returning alternatives, the list may contains multiple results.
 
 For example, an implementation with segmentation support returns
 
 ```JavaScript
-{
-  text: "best prediction",
-  segmentationResult: [...],
-  alternatives: [
-    { text: "2nd best prediction", segmentationResult: [...] },
-    { text: "3rd best prediction", segmentationResult: [...] },
-    ...
-  ]
-}
+[
+  { text: "best prediction", segmentationResult: [...] },
+  { text: "2nd best prediction", segmentationResult: [...] },
+  { text: "3rd best prediction", segmentationResult: [...] },
+]
 ```
 
 
@@ -523,14 +533,10 @@ const optionalHints = {
 
 // Recognize the text.
 const result = recognizer.recognize(drawing, optionalHints)
-// => The result object:
-//   {
-//     text: “best prediction”,
-//     boundingBox: { x, y, width, height },
-//     alternatives: [
-//       { text: “second best”} },
-//       { text: “third best”} },
-//       ...    // Up to alternatives number
-//     ]
-//   }
+// => The result list:
+//   [
+//     { text: "best prediction" },
+//     { text: "2nd best prediction" },
+//     ...
+//   ]
 ```
