@@ -185,16 +185,25 @@ const drawing = recognizer.startDrawing(optionalHints)
 // Create a new stroke.
 const stroke = new HandwritingStroke()
 
-// Create a stroke and add points.
+// Add a point.
+const point = { x: 84, y: 34, t: 959 }
+
 // The point dictionary is copied, and added to the stroke object.
-stroke.addPoint({ x: 84, y: 34, t: 959.685 })
+stroke.addPoint(point)
+
+// Modifying a point added to a stroke has no effect.
+point.x = newX    // We don't want this.
+stroke.getPoints()[0].x = newX    // We don't want this.
+
+// The point's value remains the same despite of two above assignments.
+stroke.getPoints()[0].x === 84    // => true
 
 // We can say it's a copy of dict
 // Add a stroke to the drawing.
 drawing.addStroke(stroke)
 
 // Add more points to the stroke.
-stroke.addPoint({ x: 93, y: 54, t: 1013.685 })
+stroke.addPoint({ x: 93, y: 54, t: 1013 })
 
 // Get predictions of the partial drawing.
 // This will take into account both points that were added to the stroke.
@@ -203,7 +212,7 @@ await drawing.getPrediction()
 
 // Add a new stroke.
 const stroke2 = new HandwritingStroke()
-stroke2.addPoint({x: 160, y: 39, t: 1761.72})
+stroke2.addPoint({x: 160, y: 39, t: 1761})
 drawing.addStroke(stroke2)
 
 // Get all strokes. Return a list of previously added HandwritingStroke object
