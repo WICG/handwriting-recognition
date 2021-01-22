@@ -150,11 +150,18 @@ await navigator.queryHandwritingRecognizerSupport({
   'unsupportedFeature': true    // Can be any value
 })
 
-// Returns true for each supported feature query, false otherwise.
+// For each query:
+//   - If the recognizer supports its feature, returns true.
+//   - If the recognizer supports its feature, but the provided
+//     parameters aren't supported, return false.
+//     For example when proving a wrong language tag.
+//   - If the recognizer doesn't support its feature, the feature
+//     name is not included in the return value.
+//
 // => {
 //   languages: true,  // The recognizer supports both en and zh-CN
 //   alternatives: true,
-//   unsupportedFeature: false
+//   // Unsupported features are not included in the return value
 // }
 ```
 
