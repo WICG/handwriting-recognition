@@ -167,15 +167,6 @@ await navigator.queryHandwritingRecognizerSupport({
 
 To mitigate passive fingerprinting, `queryHandwritingRecognizerSupport` may throw an Error if the website issues too many queries (e.g. when trying to enumerate all supported languages). The browser may show a permission prompt and ask if user grants access to unrestricted handwriting recognition features (before throwing the Error).
 
-**TODO: ** Figure out a suitable privacy protection for `getPrediction()` (or `createHandwritingRecognizer()`).
-- Gate it behind a one-off permission prompt. Go head with this, until we see sufficient interest of using this API without permission prompts.
-- Require handwritings to be composed of user action (e.g. event.isTrusted) only.
-- Mix of both? We can have two types of drawings?
-  - One accepts arbitrary points (`{x,y,t}`)
-  - One only accepts certain events (`mousemove`, `touchmove`), and is constructed with a writing area bounding box.
-
-**TODO: ** Update the fingerprint section.
-
 
 ### Perform Recognition
 
@@ -470,9 +461,40 @@ Thus, we choose to use ranking instead of score. This gives some indication on w
 
 ### Fingerprinting
 
-The underlying handwriting recognition algorithm is a fingerprint vector, it could expose information about the device (e.g. operating system). However, this information is already available in the navigator object.
+The fingerprint vector comes from two parts: feature detection and recognizer implementation.
 
-The actual handwriting (of a user) is a good way of fingerprinting the user, but it is already available for collection using canvas, so we don't think this API will expose additional vectors for fingerprinting the user.
+The amount of information (entropy) exposed depends on user agent's implementation. We believe there isn't a one-size-fits-all solution, and recommend the user agents decide whether privacy protections (e.g. permission prompts) are necessary for their users.
+
+**Feature detection** could expose information about:
+* User's language (or installed handwriting recognition models). This is also available in `navigator.languages`.
+* The recognizer implementation being used, by summarizing the set of supported features. This might lead to some conclusions about the operating system and its version.
+
+This can be mitigated by [privacy budget](https://github.com/bslassey/privacy-budget). The user agent can choose to throw errors (or return less accurate informations), if the number of queries to `queryHandwritingRecognizerSupport` is excessive (e.g. querying dozens of languages in one browsing session).
+
+**Recognizer implementation** might expose information about the operating system, the device, or the user's habit. This largely depends on the recognizer technology being used.
+
+Below are some types of recognizer implementations, and their associated risks:
+
+* No recognizer support: No fingerprint risk.
+
+* Cloud-based recognizer: Little to no risk. The website might be able to detect the cloud service being used (by comparing the prediction result against the result obtained by calling the cloud service directly). No extra information is revealed about the user or their device.
+
+* Stateless models (most common): Output of such models is entirely dependent on the input drawing and the model itself.
+
+  * Models that can only updated with the browser (e.g. entirely implemented within the browser): The website can learn about the browser's version, which can otherwise be detected by other means.
+
+  * Models that can be updated outside of browser (e.g. implemented by calling an operating system API), depending on the scenario, the website can learn:
+
+    * OS version, if the models are updated along with every OS update.
+    * OS version range, if the models are updated with some but not all OS updates.
+    * A specific update patch revision, if the models are updated out-of-band or on-demand.
+
+  * Note, if the models utilizes hardware accelerators (e.g. GPU). The result might reveal information about particular hardwares.
+
+* Stateful / Reinforced learning models (worst hypothetical case): These models can learn based on the previous usages. For example, an OS recognizer that adjusts its output based on user's IME habits. These models can reveal large amount of information about the user, and poses a huge risk. \
+However, we aren't aware of any recognizer implementations that falls within this type. But we recommend using privacy protection for these models, or use a fresh / clean state for each session.
+
+**Cost of fingerprinting**: the fingerprinting solution need to craft and curate a set of handwriting drawings (adversarial samples) to exploit differences across models. The cost of generating these samples may be high, but it's safe to assume a motivated party can obtain such samples.
 
 
 ### Language Handling
