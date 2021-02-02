@@ -491,7 +491,7 @@ Below are some types of recognizer implementations, and their associated risks:
 
   * Note, if the models utilizes hardware accelerators (e.g. GPU). The result might reveal information about particular hardwares.
 
-* Stateful / Reinforced learning models (worst hypothetical case): These models can learn based on the previous usages. For example, an OS recognizer that adjusts its output based on user's IME habits. These models can reveal large amount of information about the user, and poses a huge risk. \
+* Stateful / Online learning models (worst hypothetical case): These models can learn based on the previous usages. For example, an OS recognizer that adjusts its output based on user's IME habits. These models can reveal large amount of information about the user, and poses a huge risk. \
 However, we aren't aware of any recognizer implementations that falls within this type. But we recommend using privacy protection for these models, or use a fresh / clean state for each session.
 
 **Cost of fingerprinting**: the fingerprinting solution need to craft and curate a set of handwriting drawings (adversarial samples) to exploit differences across models. The cost of generating these samples may be high, but it's safe to assume a motivated party can obtain such samples.
