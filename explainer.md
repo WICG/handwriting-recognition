@@ -282,8 +282,6 @@ For example, these feature names are supported in this proposal:
 
 This API follows the usual Web coordinate system. A coordinate is represented by its `x` and `y` attribute.  They represent the horizontal and vertical distance from the top-left corner. The top-left corner coordinate is `(x=0, y=0)`.
 
-A bounding box is represented by its top-left corner (`x` and `y`), `width` and `height`. The API uses `DOMRectReadOnly` when returning one bounding box.
-
 ### Time
 
 Time (`t` attribute of an ink point) is measured as a number of milliseconds elapsed since some reference time point (e.g. `Date.now()`).
