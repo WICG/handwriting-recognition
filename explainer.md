@@ -400,12 +400,12 @@ For example, the handwriting "int" produces a segmentation result like this:
     // Drawing segments that make up the grapheme.
     segments: [
       {
-        stroke: handwritingStroke1,
+        strokeIndex: 0,
         beginPointIndex: 0,
         endPointIndex: 30,
       },
       {
-        stroke: handwritingStroke5,
+        strokeIndex: 1,
         beginPointIndex: 0,
         endPointIndex: 5,
       }
@@ -419,7 +419,7 @@ For example, the handwriting "int" produces a segmentation result like this:
 ]
 ```
 
-The handwriting stroke objects returned in the `segments` field is the exact same object passed to `drawing.addStroke()` (the identity operator `===` returns true).
+The indices in segmentation results are based on its `getPrediction()` call. If the application modifies the drawing before `getPrediction()` returns, the indices may differ from what's currently in the drawing (e.g. `getStrokes()`).
 
 Whitespaces are not included in the segmentation result, even if they are part of the predicted text.
 
