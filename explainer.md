@@ -258,6 +258,8 @@ await drawing.finish()
 
 ## Proposed API
 
+See [idl.md](./idl.md) for interface definition.
+
 ### Feature Detection
 
 Handwriting recognition can be implemented in different ways. We expect different implementations to different sets of features (and hints).
