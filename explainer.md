@@ -209,6 +209,9 @@ stroke.getPoints()[0].x = newX    // We don't want this.
 // The point's value remains the same despite of two above assignments.
 stroke.getPoints()[0].x === 84    // => true
 
+// Point's time attribute is optional.
+stroke.addPoint({ x: 93, y: 54 })
+
 // We can say it's a copy of dict
 // Add a stroke to the drawing.
 drawing.addStroke(stroke)
@@ -290,15 +293,18 @@ Time (`t` attribute of an ink point) is measured as a number of milliseconds ela
 
 ### The ink and drawing model
 
-An **ink point** is represented by a JavaScript object that has _at least_ three attributes:
+An **ink point** is represented by a JavaScript object that has _at least_ two attributes:
 
 *   `x`: number, the horizontal component of its coordinate.
 *   `y`: number, the vertical component of its coordinate.
-*   `t`: number, a timestamp, the number of milliseconds elapsed since the starting time (e.g. when the first ink point of the drawing is captured).
 
-An ink point can have extra attributes. For example, pen-tip pressure and angles. These attributes are optional. If they are available. recognizers may use them to improve accuracy.
+If any of the above attributers are missing, relevant methods should throw an Error.
 
-The recognizer will function with only the required attributes.
+The implementation can choose to support extra optional attributes (e.g. time, pen-tip angle) to improve accuracy, but must function with only the required attributes.
+
+In this explainer, we define the following optional attribute:
+
+*   `t`: number, a timestamp, the number of milliseconds elapsed since the starting time (e.g. when the first ink point of the drawing is captured). If missing, the implementation is free to interpolate or remove it altogether.
 
 An **ink stroke** is represented by a JavaScript `HandwritingStroke` object, created by the client using the constructor. The ink points in a stroke _should_ have ascending `t` attributes.
 
@@ -455,6 +461,13 @@ We expect different browser vendors to offer varying recognizer implementations,
 Because the score is an implementation detail of machine learning models, the meaning of score changes if the model changes. Therefore, scores are not comparable unless everyone uses the same model.
 
 Thus, we choose to use ranking instead of score. This gives some indication on which alternative is better. This avoids the scenario where web developers misunderstand the score's implication and try to compare scores across different libraries, or filtering results based on it.
+
+### Why optional time
+In certain situations, time information may be unavailable (e.g. recognize a previously captured handwriting stored in an image) or deliberately removed (e.g. for protecting user privacy).
+
+For recognizers, some don't need time information to work (e.g. OCR recognizers), they might remove time information altogether; Some uses time information to improve performance (if available), but filling missing values with a default might hurt performance.
+
+Therefore, we choose to make time attribute optional. This allows the API to accurately determine the availability of time information, and gives more flexibility.
 
 
 ## Considerations
