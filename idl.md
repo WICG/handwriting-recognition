@@ -41,7 +41,6 @@ interface HandwritingRecognizer {
   [RaisesException] void finish();
 };
 
-```webidl
 dictionary HandwritingHints {
   DOMString recognitionType = "text";
   DOMString inputType = "mouse";
