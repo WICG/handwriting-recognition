@@ -1,4 +1,3 @@
-
 # Handwriting Recognition Explainer
 
 Authors:
@@ -14,7 +13,6 @@ Handwriting is a widely used input method, one key usage is to recognize the tex
 We want to add handwriting recognition capability to the web platform, so developers can use the existing handwriting recognition features available on the operating system.
 
 This document describes our proposal for a Web Platform API for performing on-line handwriting recognition from recorded real-time user inputs (e.g. touch, stylus).  The term “on-line” means the API recognizes the text as the users are drawing them.
-
 
 ## Problem Description
 
@@ -43,8 +41,6 @@ Return a list of alternatives (candidates) of the text.
 Non-goals:
 * Design an API to recognize texts in static images. That is optical character recognition, and is better aligned with Shape Detection API.
 * Deliver consistent output across all platforms. This is very difficult, unless we implement a common (publicly owned) algorithm. Therefore, we allow the same drawing to yield different outputs. But we want to achieve a common output structure (e.g. what attribute A means, which attributes must be present).
-
-
 
 ## Existing APIs
 
@@ -84,7 +80,6 @@ for each (IInkAnalysisNode node in drawings) {
 }
 ```
 
-
 ### [Apple PencilKit](https://developer.apple.com/documentation/pencilkit)
 
 PencilKit provides support for creating and managing ink drawings, key classes are:
@@ -95,7 +90,6 @@ PencilKit provides support for creating and managing ink drawings, key classes a
 *   `Ink` represents the styling of the stroke (i.e. width, color, type).
 
 Apple hasn't disclosed a public API for online handwriting recognition. But iPadOS 14 has the capability to convert handwriting to text.
-
 
 ### [MyScript](https://developer.myscript.com/)
 
@@ -145,9 +139,9 @@ Handwriting recognizers on different platforms have different features. Web appl
 ```JavaScript
 // The list of features to detect.
 await navigator.queryHandwritingRecognizerSupport({
-  'languages': ['en', 'zh-CN']  // A list of languages
-  'alternatives': true          // Can be any value
-  'unsupportedFeature': true    // Can be any value
+  'languages': ['en', 'zh-CN'],  // A list of languages
+  'alternatives': true,          // Can be any value
+  'unsupportedFeature': true,    // Can be any value
 })
 
 // For each query:
@@ -166,7 +160,6 @@ await navigator.queryHandwritingRecognizerSupport({
 ```
 
 To mitigate passive fingerprinting, `queryHandwritingRecognizerSupport` may throw an Error if the website issues too many queries (e.g. when trying to enumerate all supported languages). The browser may show a permission prompt and ask if user grants access to unrestricted handwriting recognition features (before throwing the Error).
-
 
 ### Perform Recognition
 
@@ -236,7 +229,6 @@ await drawing.getPrediction()
 //   { text: "...", /* extra fields */  }
 // ]
 
-
 // Add a new stroke.
 const stroke2 = new HandwritingStroke()
 stroke2.addPoint({x: 160, y: 39, t: 1761})
@@ -257,7 +249,6 @@ await drawing.getPrediction()
 // object will throw an error.
 await drawing.finish()
 ```
-
 
 ## Proposed API
 
@@ -329,7 +320,6 @@ We propose the following model option:
 
 * `languages`: A list of languages that the recognizer should attempt to recognize. They are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
 
-
 ### Recognition hints
 
 The recognizer _may_ accept hints to improve accuracy for each drawing.
@@ -363,7 +353,6 @@ A prediction result _may_ contain additional attributes (if the implementation s
 
 *   `segmentationResult`: A list of JavaScript objects, explained in the below [Segmentation Result](#segmentation-result) section.
 
-
 `getPrediction()` method returns a list of prediction results, in decreasing order of confidence (e.g. the first result is the best prediction).
 
 *   This list must have at least one prediction result.
@@ -379,8 +368,8 @@ For example, an implementation with segmentation support returns
 ]
 ```
 
-
 ### Segmentation result
+
 Segmentation result is a mapping from recognized graphemes (user-perceived characters) to their composing strokes and points. This provides per-character editing functionality (e.g. delete this handwriting character in a note taking app).
 
 The segmentation result is a partition of the drawing: every point is attributed to exactly one grapheme.
@@ -433,20 +422,22 @@ Whitespaces are not included in the segmentation result, even if they are part o
 
 In most languages, a grapheme (a user-perceived unit of orthography) corresponds to a Unicode grapheme cluster. For example, in Latin alphabet, grapheme "a" corresponds to grapheme cluster `U+0061`; "ä" corresponds to grapheme cluster `U+0061 U+0308`. In some complex scripts, some graphemes are composed of multiple grapheme clusters. For example, in Balinese, ᬓ᭄ᬱᭀ is made up of two Unicode grapheme clusters: `U+1B13` and `U+1B44 U+1B31 U+1B40`.
 
-
 ## Design Questions
+
 ### Why not use Web Assembly?
+
 Web Assembly would not allow the use of more advanced proprietary handwriting libraries (e.g. those available on the operating system). Web developers also need to manage distribution (and update) of such libraries (might take several megabytes for each update).
 
 Web API can do the same task more efficiently (better models, zero distribution cost, faster computation). This topic was previously discussed in Shape Detection API and Text-to-Speech API.
 
-
 ### Why not use Shape Detection?
+
 Handwriting (in this proposal) includes temporal information (how the shape is drawn, pixel by pixel). We believe this additional temporal information distinguishes handwriting recognition from shape detection.
 
 If we take out the temporal information, the task becomes optical character recognition (given a photo of written characters). This is a different task, and indeed fits within the scope of shape detection.
 
 ### Grapheme vs. Unicode code points
+
 Grapheme is the minimal unit used in writing. It represents visual shape. On the other hand, Unicode code points are a computer's internal representation. It represents meaning. The two concepts aren't fully correlated.
 
 Unicode combining marks are represented as a single code point. They are used to modify other characters, but not by themselves. This creates a problem when we need to distinguish between shape and meaning. For example, letter a (U+0061) and grave accent combining mark (U+0300) combines to à. Letter न (U+0928) and combining mark  ि (U+093F) combines to letter नि.
@@ -454,6 +445,7 @@ Unicode combining marks are represented as a single code point. They are used to
 Handwriting recognition concerns with shape (input) and meaning (output). It's important to distinguish between those two. For example, when requesting to recognize only certain characters, graphemes should be used.
 
 ### Ranking vs. Score
+
 It's very common to use a score for assessing alternative texts. This is commonly implemented in machine learning algorithms. However, it is not a good idea for the Web.
 
 We expect different browser vendors to offer varying recognizer implementations, this will inevitably lead to the score being incomparable.
@@ -468,7 +460,6 @@ In certain situations, time information may be unavailable (e.g. recognize a pre
 For recognizers, some don't need time information to work (e.g. OCR recognizers), they might remove time information altogether; Some uses time information to improve performance (if available), but filling missing values with a default might hurt performance.
 
 Therefore, we choose to make time attribute optional. This allows the API to accurately determine the availability of time information, and gives more flexibility.
-
 
 ## Considerations
 
@@ -509,7 +500,6 @@ However, we aren't aware of any recognizer implementations that falls within thi
 
 **Cost of fingerprinting**: the fingerprinting solution need to craft and curate a set of handwriting drawings (adversarial samples) to exploit differences across models. The cost of generating these samples may be high, but it's safe to assume a motivated party can obtain such samples.
 
-
 ### Language Handling
 
 For querying for supported languages, the implementation should only return the language tags that have dedicated (or fine-tuned) models. For example, if the implementation only has a generic English language model, it should only include "en" in supportedLanguages, even if this model works for its language variants (e.g. en-US).
@@ -546,7 +536,6 @@ The current design (of using model constraints) has room for a future addition `
 This API aims to find the "greatest common divisor" of major platforms. The input to handwriting recognizer function should be easily translated to the input required by the underlying handwriting recognition API (available on the operating system).
 
 Browsers can implement their own handwriting recognition algorithm, if there are no native ones, or they decides to provide cross-platform consistency.
-
 
 ### Incremental recognition
 
