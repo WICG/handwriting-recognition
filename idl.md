@@ -42,6 +42,7 @@ interface HandwritingRecognizer {
 };
 
 dictionary HandwritingHints {
+  sequence<DOMString> graphemeSet = [];
   DOMString recognitionType = "text";
   DOMString inputType = "mouse";
   DOMString textContext = "";
