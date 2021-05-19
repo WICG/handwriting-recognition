@@ -9,6 +9,10 @@ Welcome to the WICG repository for the Handwriting Recognition API. This API aim
 * [Explainer](./explainer.md)
 * [Interface Definition (Web IDL)](./idl.md)
 
+Community contributed:
+
+* [TypeScript Definition (Credit @christianliebel)](https://github.com/christianliebel/handwriting-textarea/blob/main/handwriting-recognition.d.ts)
+
 ## Contributing
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md).
 
