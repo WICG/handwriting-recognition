@@ -9,25 +9,28 @@ partial interface Navigator {
   Promise<HandwritingRecognizer>
       createHandwritingRecognizer(HandwritingModelConstraint constraint);
 
+  // V2 feature query.
   [CallWith=ScriptState, RaisesException]
-  Promise<HandwritingFeatureQueryResult>
-      queryHandwritingRecognizerSupport(HandwritingFeatureQuery query);
-};
-
-dictionary HandwritingFeatureQuery {
-  sequence<DOMString> languages;
-  any alternatives;
-  any segmentationResult;
-};
-
-dictionary HandwritingFeatureQueryResult {
-  boolean languages;
-  boolean alternatives;
-  boolean segmentationResult;
+  Promise<HandwritingRecognitionLanguageSupportResult?>
+      queryHandwritingRecognitionLanguage(DOMString language);
 };
 
 dictionary HandwritingModelConstraint {
   required sequence<DOMString> languages;
+};
+
+dictionaty HandwritingRecognitionLanguageSupportResult {
+  required DOMString canonicalLanguageTag;
+  bool textAlternatives;
+  bool textSegmentation;
+  HandwritingHintsQueryResult hints;
+};
+
+dictionaty HandwritingHintsQueryResult {
+  array<DOMString> recognitionType;
+  array<DOMString> inputType;
+  bool textContext;
+  bool alternatives;
 };
 ```
 
@@ -98,5 +101,28 @@ dictionary HandwritingDrawingSegment {
   required unsigned long strokeIndex;
   required unsigned long beginPointIndex;
   required unsigned long endPointIndex;
+};
+```
+
+## Previous API
+### Feature Query
+```webidl
+// V1 feature query, replaced by queryHandwritingRecognitionLanguage.
+[CallWith=ScriptState, RaisesException]
+partial interface Navigator {
+  Promise<HandwritingFeatureQueryResult>
+      queryHandwritingRecognizerSupport(HandwritingFeatureQuery query);
+}
+
+dictionary HandwritingFeatureQuery {
+  sequence<DOMString> languages;
+  any alternatives;
+  any segmentationResult;
+};
+
+dictionary HandwritingFeatureQueryResult {
+  boolean languages;
+  boolean alternatives;
+  boolean segmentationResult;
 };
 ```
