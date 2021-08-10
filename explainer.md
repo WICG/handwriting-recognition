@@ -132,34 +132,40 @@ MyScript also provides helper classes and SDKs to manage stroke capture. Applica
 
 ## Proposed Usage Example
 
-### Query Feature Support
+### Query Language Support (V2)
 
 Handwriting recognizers on different platforms have different features. Web applications can query their feature support and decide if the API is suitable for their use case.
 
 ```JavaScript
+<<<<<<< HEAD
 // The list of features to detect.
 await navigator.queryHandwritingRecognizerSupport({
   'languages': ['en', 'zh-CN'],  // A list of languages
   'alternatives': true,          // Can be any value
   'unsupportedFeature': true,    // Can be any value
 })
+=======
+// Query which features are supported for a given language.
+// This function takes a BCP 47 language tag, and returns a dictionary
+// about the features supported.
+await navigator.queryHandwritingRecognitionLanguage('en-US')
+>>>>>>> c6d08b1 (explainer: v2 proposal for language support query)
 
-// For each query:
-//   - If the recognizer supports its feature, returns true.
-//   - If the recognizer supports its feature, but the provided
-//     parameters aren't supported, return false.
-//     For example when proving a wrong language tag.
-//   - If the recognizer doesn't support its feature, the feature
-//     name is not included in the return value.
-//
 // => {
-//   languages: true,  // The recognizer supports both en and zh-CN
-//   alternatives: true,
-//   // Unsupported features are not included in the return value
+//   canonicalLanguageTag: 'en',
+//   textAlternatives: true,
+//   textSegmentation: true,
+//   hints: {
+//     graphemeSet: true,
+//     textContext: true,,
+//     inputTypes: ['mouse', 'touch', 'stylus']
+//   }
 // }
+//
+// => `null` if the provided language isn't supported.
 ```
 
-To mitigate passive fingerprinting, `queryHandwritingRecognizerSupport` may throw an Error if the website issues too many queries (e.g. when trying to enumerate all supported languages). The browser may show a permission prompt and ask if user grants access to unrestricted handwriting recognition features (before throwing the Error).
+To mitigate passive fingerprinting, `queryHandwritingRecognitionLanguage` may throw an Error if the website issues too many queries (e.g. when trying to enumerate all supported languages). The browser may show a permission prompt and ask if user grants access to unrestricted handwriting recognition features (before throwing the Error).
 
 ### Perform Recognition
 
@@ -167,7 +173,9 @@ To mitigate passive fingerprinting, `queryHandwritingRecognizerSupport` may thro
 // Model constraints determine the handwriting recognition model
 // used to create the recognizer.
 const modelConstraints = {
-  languages: ['zh-CN', 'en'],  // Languages, in order of precedence
+  // Languages, in order of precedence.
+  // The returned `canonicalLanguageTag` in the previous step can be used.
+  languages: ['zh-CN', 'en'],
 }
 
 // Create a handwriting recognizer.
@@ -254,25 +262,19 @@ await drawing.finish()
 
 See [idl.md](./idl.md) for interface definition.
 
-### Feature Detection
+### Feature Detection (V2)
 
 Handwriting recognition can be implemented in different ways. We expect different implementations to different sets of features (and hints).
 
-The `queryHandwritingRecognizerSupport` method allows Web developers to query implementation-specific features, decide whether handwriting recognition is supported, and whether it is suitable for their use case.
+The `queryHandwritingRecognitionLanguage` method allows Web developers to query implementation-specific features, decide whether handwriting recognition is supported, and whether it suits their use case.
 
-This method takes the query array, where each array element is a feature name (query). This method returns a dictionary, whose keys are the provided feature names, and the values are some information about the feature.
+This method takes a BCP 47 language tag. It resolves to a dictionary describing the features supported for the provided language. If a language isn't supported, this method resolves to `null`.
 
-Conventionally, feature name is the same as the key name used in method arguments or outputs. If a feature name is not supported, the value (for that key-value pair) is `null`.
+These features are defined in this proposal:
 
-For example, these feature names are supported in this proposal:
-
-* `graphemeSet`
-* `alternatives`
-* `textContext`
-* `languages`
-* `recognitionTypes`
-* `inputTypes`
-* `segmentationResult`
+* `textAlternatives`: whether the recognition algorithm returns alternative results
+* `textSegmentation`: whether the recognition algorithm returns per-grapheme segmentations
+* `hints`: optional hints the recognition algorithm accepts, this may be different for each language
 
 ### Coordinates
 
@@ -324,7 +326,9 @@ We propose the following model option:
 
 The recognizer _may_ accept hints to improve accuracy for each drawing.
 
-Clients can optionally provide hints (or some combinations) when creating a `HandwritingRecognizer` object. Providing unsupported hints has no effect.
+Clients can optionally provide hints (or some combinations) when creating a `HandwritingDrawing` object. Providing unsupported hints has no effect.
+
+A dictionary of supported hints and their supported values are returned in `queryHandwritingRecognitionLanguage`.
 
 We propose the following hint attributes:
 
@@ -502,7 +506,7 @@ However, we aren't aware of any recognizer implementations that falls within thi
 
 ### Language Handling
 
-For querying for supported languages, the implementation should only return the language tags that have dedicated (or fine-tuned) models. For example, if the implementation only has a generic English language model, it should only include "en" in supportedLanguages, even if this model works for its language variants (e.g. en-US).
+For querying for language support, the implementation should return a `canonicalLanguageTag` that best explains the underlying recognition model. For example, if the implementation only has a generic English language model, it should return "en", even if this model works for its language variants (e.g. en-US). If the implementation has fine-tuned English models for "en-US", it should return "en-US".
 
 Web developers may provide subtags (e.g. region and script). The implementation should interpret them, and choose fallbacks if necessary. In general:
 
@@ -516,20 +520,11 @@ In the current design, `createHandwritingRecognizer` takes model constraints, an
 
 This offload some work for Web developers. Developers don't have to write logics to pick a specific model (e.g. parse language tags, decide fallbacks, etc.) from a list of supported models.
 
-At early design stages, we are unsure if requiring web applications to explicitly pick a model is a good idea (or ergonomic for web developers). We'd need developer feedbacks to better decide this.
+At early design stages, we are unsure if requiring web applications to explicitly pick a model is ergonomic. We'd need developer feedbacks to better decide this.
 
-The current design (of using model constraints) has room for a future addition `modelIdentifier` field. This would work similarly to Web Speech Synthesis API, where the web application explicitly chooses a voice.
+The current API design allows `canonicalLanguageTag` to act as a model identifier. It works similarly to Web Speech Synthesis API, where the web application explicitly chooses a voice.
 
-* `queryHandwritingRecognizerSupport` would have a `supportedModels` query. It returns a JavaScript object describing the characteristics of the available models.
-    ````JavaScript
-    {
-      identifier: 'zh-Hani',
-      languages: ['zh'],
-      offlineService: true,
-      ... /* Attributes may vary based on platform */
-    }
-    ````
-* `modelIdentifier` is mutually exclusive with other model constraints. If it's used with any other constraint, `createHandwritingRecognizer` will throw an Error.
+Websites can pass the returned `canonicalLanguageTag` to `createHandwritingRecognizer`, and the recognizer will pick an exact model based on it.
 
 ### Interoperability
 
@@ -580,3 +575,32 @@ const result = recognizer.recognize(drawing, optionalHints)
 //     ...
 //   ]
 ```
+
+## API changes
+### Original Proposal for Feature Query (V1)
+```JavaScript
+// The list of features to detect.
+await navigator.queryHandwritingRecognizerSupport({
+  'languages': ['en', 'zh-CN']  // A list of languages
+  'alternatives': true          // Can be any value
+  'unsupportedFeature': true    // Can be any value
+})
+
+// For each query:
+//   - If the recognizer supports its feature, returns true.
+//   - If the recognizer supports its feature, but the provided
+//     parameters aren't supported, return false.
+//     For example when proving a wrong language tag.
+//   - If the recognizer doesn't support its feature, the feature
+//     name is not included in the return value.
+//
+// => {
+//   languages: true,  // The recognizer supports both en and zh-CN
+//   alternatives: true,
+//   // Unsupported features are not included in the return value
+// }
+```
+
+We changed language support query to take in a language tag (V2), and return a dictionary containing attributes instead of taking in a dictionary of features.
+
+This improves API's expandability, and makes it easier to interpret the result. This also enables better integration with Privacy Budget by limiting the number of languages a website can query.
