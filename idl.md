@@ -7,28 +7,27 @@ Web IDL for Handwriting Recognition API
 partial interface Navigator {
   [CallWith=ScriptState, RaisesException]
   Promise<HandwritingRecognizer>
-      createHandwritingRecognizer(HandwritingModelConstraint constraint);
+      createHandwritingRecognizer(HandwritingModelConstraints constraints);
 
   // V2 feature query.
   [CallWith=ScriptState, RaisesException]
-  Promise<HandwritingRecognitionLanguageSupportResult?>
-      queryHandwritingRecognitionLanguage(DOMString language);
+  Promise<HandwritingRecognizerQueryResult?>
+      queryHandwritingRecognizer(HandwritingModelConstraints constraints);
 };
 
-dictionary HandwritingModelConstraint {
+dictionary HandwritingModelConstraints {
   required sequence<DOMString> languages;
 };
 
-dictionaty HandwritingRecognitionLanguageSupportResult {
-  required DOMString canonicalLanguageTag;
+dictionaty HandwritingRecognizerQueryResult {
   bool textAlternatives;
   bool textSegmentation;
   HandwritingHintsQueryResult hints;
 };
 
 dictionaty HandwritingHintsQueryResult {
-  array<DOMString> recognitionType;
-  array<DOMString> inputType;
+  sequence<DOMString> recognitionType;
+  sequence<DOMString> inputType;
   bool textContext;
   bool alternatives;
 };
