@@ -132,18 +132,22 @@ MyScript also provides helper classes and SDKs to manage stroke capture. Applica
 
 ## Proposed Usage Example
 
-### Query Language Support (V2)
+### Query Feature Support (V2)
 
 Handwriting recognizers on different platforms have different features. Web applications can query their feature support and decide if the API is suitable for their use case.
 
 ```JavaScript
-// Query which features are supported for a given language.
-// This function takes a BCP 47 language tag, and returns a dictionary
-// about the features supported.
-await navigator.queryHandwritingRecognitionLanguage('en-US')
+// Model constraints describes the recognizer's essential capabilities.
+const modelConstraints = {
+  // All languages to be recognized, in order of precedence.
+  languages: ['zh-CN', 'en'],
+}
+
+// Query which features are supported. This method takes model constraints
+// and returns a feature description.
+await navigator.queryHandwritingRecognizer(modelConstraints)
 
 // => {
-//   canonicalLanguageTag: 'en',
 //   textAlternatives: true,
 //   textSegmentation: true,
 //   hints: {
@@ -153,23 +157,16 @@ await navigator.queryHandwritingRecognitionLanguage('en-US')
 //   }
 // }
 //
-// => `null` if the provided language isn't supported.
+// => `null` if the constraint can't be satisfied.
 ```
-
-To mitigate passive fingerprinting, `queryHandwritingRecognitionLanguage` may throw an Error if the website issues too many queries (e.g. when trying to enumerate all supported languages). The browser may show a permission prompt and ask if user grants access to unrestricted handwriting recognition features (before throwing the Error).
 
 ### Perform Recognition
 
 ```JavaScript
-// Model constraints determine the handwriting recognition model
-// used to create the recognizer.
-const modelConstraints = {
-  // Languages, in order of precedence.
-  // The returned `canonicalLanguageTag` in the previous step can be used.
-  languages: ['zh-CN', 'en'],
-}
-
 // Create a handwriting recognizer.
+//
+// This method may reject if the recognizer can't be created. For example,
+// the modelConstraints can't be satisfied, or there aren't enough resources.
 const recognizer = await navigator.createHandwritingRecognizer(modelConstraints)
 
 // Optional hints to improve recognizer's performance on a drawing
@@ -257,15 +254,15 @@ See [idl.md](./idl.md) for interface definition.
 
 Handwriting recognition can be implemented in different ways. We expect different implementations to different sets of features (and hints).
 
-The `queryHandwritingRecognitionLanguage` method allows Web developers to query implementation-specific features, decide whether handwriting recognition is supported, and whether it suits their use case.
+The `queryHandwritingRecognizer` method allows Web developers to query implementation-specific features and decide whether the recognizer meets their needs.
 
-This method takes a BCP 47 language tag. It resolves to a dictionary describing the features supported for the provided language. If a language isn't supported, this method resolves to `null`.
+This method takes a model constraints object. It resolves to a dictionary describing the supported features. If the constraints can't be met, it resolves to `null`.
 
 These features are defined in this proposal:
 
-* `textAlternatives`: whether the recognition algorithm returns alternative results
-* `textSegmentation`: whether the recognition algorithm returns per-grapheme segmentations
-* `hints`: optional hints the recognition algorithm accepts, this may be different for each language
+* `textAlternatives`: whether the recognizer returns alternative results
+* `textSegmentation`: whether the recognizer returns grapheme segmentations
+* `hints`: optional hints the recognizer accepts, this may be different for each model constraint
 
 ### Coordinates
 
@@ -301,17 +298,17 @@ A **drawing** is represented by a JavaScript `HandwritingDrawing` object, create
 
 ### Model constraints
 
-Model constraints are used to determine and initialize the underlying handwriting recognition algorithm. They describes a set of constraints that the created recognizer must satisfy.
+Model constraints are used to determine and initialize the underlying handwriting recognition algorithm. They describes a set of constraints that must be satisfied.
 
 Model constraints can be empty. In this case, the browser is free to choose a default (e.g. based on `navigator.languages`).
 
-`createHandwritingRecognizer` throws an `Error` if:
-* The provided constraints can't be satisfied (e.g. the browser has no model for the chosen language)
+`createHandwritingRecognizer` rejects with an `Error` if:
+* The provided constraints can't be satisfied (e.g. no model can satisfy the constraints)
 * There isn't enough resource to initialize a recognizer (e.g. out of memory)
 
-We propose the following model option:
+We propose the following constraints:
 
-* `languages`: A list of languages that the recognizer should attempt to recognize. They are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
+* `languages`: A list of languages to be recognized. They are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
 
 ### Recognition hints
 
@@ -319,7 +316,7 @@ The recognizer _may_ accept hints to improve accuracy for each drawing.
 
 Clients can optionally provide hints (or some combinations) when creating a `HandwritingDrawing` object. Providing unsupported hints has no effect.
 
-A dictionary of supported hints and their supported values are returned in `queryHandwritingRecognitionLanguage`.
+A dictionary of supported hints and their supported values are returned in `queryHandwritingRecognizer`.
 
 We propose the following hint attributes:
 
@@ -468,7 +465,7 @@ The amount of information (entropy) exposed depends on user agent's implementati
 * User's language (or installed handwriting recognition models). This is also available in `navigator.languages`.
 * The recognizer implementation being used, by summarizing the set of supported features. This might lead to some conclusions about the operating system and its version.
 
-This can be mitigated by [privacy budget](https://github.com/bslassey/privacy-budget). The user agent can choose to throw errors (or return less accurate informations), if the number of queries to `queryHandwritingRecognizerSupport` is excessive (e.g. querying dozens of languages in one browsing session).
+This can be mitigated by [privacy budget](https://github.com/bslassey/privacy-budget). The browser can choose to reject promises, if the website issues excessive queries. The browser can also show permission prompts asking user to grant unrestricted handwriting recognition features.
 
 **Recognizer implementation** might expose information about the operating system, the device, or the user's habit. This largely depends on the recognizer technology being used.
 
@@ -496,26 +493,26 @@ However, we aren't aware of any recognizer implementations that falls within thi
 **Cost of fingerprinting**: the fingerprinting solution need to craft and curate a set of handwriting drawings (adversarial samples) to exploit differences across models. The cost of generating these samples may be high, but it's safe to assume a motivated party can obtain such samples.
 
 ### Language Handling
-
-For querying for language support, the implementation should return a `canonicalLanguageTag` that best explains the underlying recognition model. For example, if the implementation only has a generic English language model, it should return "en", even if this model works for its language variants (e.g. en-US). If the implementation has fine-tuned English models for "en-US", it should return "en-US".
-
 Web developers may provide subtags (e.g. region and script). The implementation should interpret them, and choose fallbacks if necessary. In general:
 
 * If the provided language tag doesn't match any recognizer, remove the last subtag until there is a match. For example, `"zh-Hans-CN"` -> `"zh-Hans"` -> `"zh"`.
-* If the browser can't match any recognizer (after the above fallbacks), `createHandwritingRecognizer` method throws an Error.
+* If the browser can't match any recognizer (after the above fallbacks), `createHandwritingRecognizer` rejects with an Error.
 
-If language model options aren't provided, this implementation should try to pick a model based on `navigator.languages` or user's input methods. If this fails to match any recognizer, `createHandwritingRecognizer` method throws an Error.
+If language model constraints aren't provided, this implementation should try to pick a model based on `navigator.languages`. If this fails to match any recognizer, `createHandwritingRecognizer` rejects with an Error.
 
 ### Model Constraints vs. Model Identifier
-In the current design, `createHandwritingRecognizer` takes model constraints, and let the browser to determine the exact recognition models being used.
+In the current design, we use model constraints and let the browser to determine the exact recognition models.
 
 This offload some work for Web developers. Developers don't have to write logics to pick a specific model (e.g. parse language tags, decide fallbacks, etc.) from a list of supported models.
 
 At early design stages, we are unsure if requiring web applications to explicitly pick a model is ergonomic. We'd need developer feedbacks to better decide this.
 
-The current API design allows `canonicalLanguageTag` to act as a model identifier. It works similarly to Web Speech Synthesis API, where the web application explicitly chooses a voice.
+The current design has room for a `modelIdentifier` field in the future. It works similarly to Web Speech Synthesis API, where the web application explicitly chooses a voice.
 
-Websites can pass the returned `canonicalLanguageTag` to `createHandwritingRecognizer`, and the recognizer will pick an exact model based on it.
+* `queryHandwritingRecognizer` can return `modelIdentifier` for given constraints.
+* `createHandwritingRecognizer` can look for `modelIdentifier`, and create the exact model.
+
+Note, model identifier is a fingerprint surface, because it could expose implementation or platform specific details (e.g. identifiers on Window differs from macOS ones).
 
 ### Interoperability
 
