@@ -64,8 +64,8 @@ dictionary HandwritingPoint {
   double x;
   double y;
 
-  // Timestamp in milliseconds since the start of the current drawing.
-  DOMTimeStamp t;
+  // The amount of time since the start of the current drawing.
+  DOMHighResTimestamp t;
 };
 ```
 
