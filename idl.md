@@ -19,15 +19,23 @@ dictionary HandwritingModelConstraints {
   required sequence<DOMString> languages;
 };
 
-dictionaty HandwritingRecognizerQueryResult {
+enum HandwritingRecognitionType{
+  "text", "email", "number", "per-character"
+};
+
+enum HandwritingInputType {
+  "mouse", "stylus", "touch"
+};
+
+dictionary HandwritingRecognizerQueryResult {
   bool textAlternatives;
   bool textSegmentation;
   HandwritingHintsQueryResult hints;
 };
 
-dictionaty HandwritingHintsQueryResult {
-  sequence<DOMString> recognitionType;
-  sequence<DOMString> inputType;
+dictionary HandwritingHintsQueryResult {
+  sequence<HandwritingRecognitionType> recognitionType;
+  sequence<HandwritingInputType> inputType;
   bool textContext;
   bool alternatives;
 };

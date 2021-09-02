@@ -132,7 +132,7 @@ MyScript also provides helper classes and SDKs to manage stroke capture. Applica
 
 ## Proposed Usage Example
 
-### Query Feature Support (V2)
+### Query Feature Support (V2, from Chrome 95)
 
 Handwriting recognizers on different platforms have different features. Web applications can query their feature support and decide if the API is suitable for their use case.
 
@@ -165,8 +165,9 @@ await navigator.queryHandwritingRecognizer(modelConstraints)
 ```JavaScript
 // Create a handwriting recognizer.
 //
-// This method may reject if the recognizer can't be created. For example,
-// the modelConstraints can't be satisfied, or there aren't enough resources.
+// This method will reject if the recognizer can't be created. For example,
+// the `modelConstraints` can't be satisfied, there aren't enough resources,
+// or the user denies the page to use handwriting recognizers.
 const recognizer = await navigator.createHandwritingRecognizer(modelConstraints)
 
 // Optional hints to improve recognizer's performance on a drawing
@@ -250,7 +251,7 @@ await drawing.finish()
 
 See [idl.md](./idl.md) for interface definition.
 
-### Feature Detection (V2)
+### Feature Detection (V2, from Chrome 95)
 
 Handwriting recognition can be implemented in different ways. We expect different implementations to different sets of features (and hints).
 
@@ -298,17 +299,18 @@ A **drawing** is represented by a JavaScript `HandwritingDrawing` object, create
 
 ### Model constraints
 
-Model constraints are used to determine and initialize the underlying handwriting recognition algorithm. They describes a set of constraints that must be satisfied.
+Model constraints are used to determine and initialize the underlying handwriting recognition algorithm. They describe a set of properties the caller expects the recognizer to satisfy.
 
 Model constraints can be empty. In this case, the browser is free to choose a default (e.g. based on `navigator.languages`).
 
 `createHandwritingRecognizer` rejects with an `Error` if:
 * The provided constraints can't be satisfied (e.g. no model can satisfy the constraints)
 * There isn't enough resource to initialize a recognizer (e.g. out of memory)
+* The user denies the page to use handwriting recognizers
 
 We propose the following constraints:
 
-* `languages`: A list of languages to be recognized. They are identified by IETF BCP 47 language tags (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
+* `languages`: A list of languages to be recognized. They are identified by [IETF BCP 47 language tags](https://tools.ietf.org/search/bcp47) (e.g. `en`, `zh-CN`, `zh-Hans`). See [Language Handling](#language-handling) for determining fallbacks if the provided tag is not supported.
 
 ### Recognition hints
 
@@ -465,7 +467,11 @@ The amount of information (entropy) exposed depends on user agent's implementati
 * User's language (or installed handwriting recognition models). This is also available in `navigator.languages`.
 * The recognizer implementation being used, by summarizing the set of supported features. This might lead to some conclusions about the operating system and its version.
 
-This can be mitigated by [privacy budget](https://github.com/bslassey/privacy-budget). The browser can choose to reject promises, if the website issues excessive queries. The browser can also show permission prompts asking user to grant unrestricted handwriting recognition features.
+Fingerprinting can be mitigated with:
+
+* [Privacy budget](https://github.com/bslassey/privacy-budget): the user agent rejects promises, if the website issues excessive queries.
+* Permission prompts: the user agent asks user to grant unrestricted handwriting recognition features.
+* Hardcoded values: the user agent returns hard-coded values for query operations, if it's possible to determine languages and features at build time.
 
 **Recognizer implementation** might expose information about the operating system, the device, or the user's habit. This largely depends on the recognizer technology being used.
 
@@ -565,7 +571,7 @@ const result = recognizer.recognize(drawing, optionalHints)
 ```
 
 ## API changes
-### Original Proposal for Feature Query (V1)
+### Original Proposal for Feature Query (V1, from Chrome 91 to 94)
 ```JavaScript
 // The list of features to detect.
 await navigator.queryHandwritingRecognizerSupport({
