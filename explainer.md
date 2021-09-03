@@ -455,9 +455,7 @@ For recognizers, some don't need time information to work (e.g. OCR recognizers)
 
 Therefore, we choose to make time attribute optional. This allows the API to accurately determine the availability of time information, and gives more flexibility.
 
-## Considerations
-
-### Fingerprinting
+## Privacy Considerations
 
 The fingerprint vector comes from two parts: feature detection and recognizer implementation.
 
@@ -497,6 +495,8 @@ Below are some types of recognizer implementations, and their associated risks:
 However, we aren't aware of any recognizer implementations that falls within this type. But we recommend using privacy protection for these models, or use a fresh / clean state for each session.
 
 **Cost of fingerprinting**: the fingerprinting solution need to craft and curate a set of handwriting drawings (adversarial samples) to exploit differences across models. The cost of generating these samples may be high, but it's safe to assume a motivated party can obtain such samples.
+
+## Design Considerations
 
 ### Language Handling
 Web developers may provide subtags (e.g. region and script). The implementation should interpret them, and choose fallbacks if necessary. In general:
