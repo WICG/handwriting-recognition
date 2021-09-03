@@ -7,27 +7,37 @@ Web IDL for Handwriting Recognition API
 partial interface Navigator {
   [CallWith=ScriptState, RaisesException]
   Promise<HandwritingRecognizer>
-      createHandwritingRecognizer(HandwritingModelConstraint constraint);
+      createHandwritingRecognizer(HandwritingModelConstraints constraints);
 
+  // V2 feature query.
   [CallWith=ScriptState, RaisesException]
-  Promise<HandwritingFeatureQueryResult>
-      queryHandwritingRecognizerSupport(HandwritingFeatureQuery query);
+  Promise<HandwritingRecognizerQueryResult?>
+      queryHandwritingRecognizer(HandwritingModelConstraints constraints);
 };
 
-dictionary HandwritingFeatureQuery {
-  sequence<DOMString> languages;
-  any alternatives;
-  any segmentationResult;
-};
-
-dictionary HandwritingFeatureQueryResult {
-  boolean languages;
-  boolean alternatives;
-  boolean segmentationResult;
-};
-
-dictionary HandwritingModelConstraint {
+dictionary HandwritingModelConstraints {
   required sequence<DOMString> languages;
+};
+
+enum HandwritingRecognitionType{
+  "text", "email", "number", "per-character"
+};
+
+enum HandwritingInputType {
+  "mouse", "stylus", "touch"
+};
+
+dictionary HandwritingRecognizerQueryResult {
+  bool textAlternatives;
+  bool textSegmentation;
+  HandwritingHintsQueryResult hints;
+};
+
+dictionary HandwritingHintsQueryResult {
+  sequence<HandwritingRecognitionType> recognitionType;
+  sequence<HandwritingInputType> inputType;
+  bool textContext;
+  bool alternatives;
 };
 ```
 
@@ -98,5 +108,28 @@ dictionary HandwritingDrawingSegment {
   required unsigned long strokeIndex;
   required unsigned long beginPointIndex;
   required unsigned long endPointIndex;
+};
+```
+
+## Previous API
+### Feature Query
+```webidl
+// V1 feature query, replaced by queryHandwritingRecognitionLanguage.
+[CallWith=ScriptState, RaisesException]
+partial interface Navigator {
+  Promise<HandwritingFeatureQueryResult>
+      queryHandwritingRecognizerSupport(HandwritingFeatureQuery query);
+}
+
+dictionary HandwritingFeatureQuery {
+  sequence<DOMString> languages;
+  any alternatives;
+  any segmentationResult;
+};
+
+dictionary HandwritingFeatureQueryResult {
+  boolean languages;
+  boolean alternatives;
+  boolean segmentationResult;
 };
 ```
