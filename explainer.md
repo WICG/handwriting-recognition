@@ -330,7 +330,7 @@ We propose the following hint attributes:
     * `per-character`: treat the handwriting to be made up by individual, unrelated characters, and do not attempt to refine the ranking. For example, serial numbers, license keys.
 * `inputType`: A string, identifying how are the strokes captured:
     * `touch`: Input was made with touchscreen
-    * `pen`: Input was made with stylus pen
+    * `stylus`: Input was made with stylus
     * `mouse`: Input was made with mouse
 * `textContext`: A string, the text that comes before the handwriting. This can be texts that were previously recognized, or were given as the writing context (e.g. "Write your name here:"). This is the linguistic context to help disambiguate the handwriting (e.g. “Hello <span style="text-decoration:underline;">world</span>” vs. “Hello <span style="text-decoration:underline;">word</span>”).
 * `alternatives`: A number, the maximum number of alternative predictions.
