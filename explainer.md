@@ -91,6 +91,57 @@ PencilKit provides support for creating and managing ink drawings, key classes a
 
 Apple hasn't disclosed a public API for online handwriting recognition. But iPadOS 14 has the capability to convert handwriting to text.
 
+### [Google ML Kit - Ink Recognition](https://developers.google.com/ml-kit/vision/digital-ink-recognition)
+
+Google MK Kit ink recognition enables developers to recognize handwritten text, emojis and basic shapes.
+
+*   `Ink.Point` stores position and timestamp. They are usually constructed from information in touch events.
+*   `Ink.Builder` and `Ink.Stroke.Builder` stores `Ink.Point`, and creates `Ink` object for recognition.
+*   `DigitalInkRecognizer` is created from model identifiers. ML Kit provides helper functions to find the most suitable model from a given [BCP 47 language tag](https://www.rfc-editor.org/bcp/bcp47.txt).
+*   The recognizer can accept `RecognitionContext` that provides contextual information about the Ink to be recognizer to improve accuracy.
+*   The recognizer produces a list of candidate, ordering based on the model's confidence.
+
+```Java
+// Creating an Ink.
+Ink.Builder inkBuilder = Ink.builder();
+Ink.Stroke.Builder strokeBuilder;
+
+strokeBuilder.addPoint(Ink.Point.create(x, y, t));
+
+// When a stroke finishes.
+inkBuilder.addStroke(strokeBuilder.build());
+
+Ink ink = inkBuilder.build();
+
+// Pick a recognition model.
+DigitalInkRecognitionModel model =
+    DigitalInkRecognitionModel.builder(
+        // Alternatively,  specify an identifier directly:
+        // DigitalInkRecognitionModelIdentifier.EN_US
+        DigitalInkRecognitionModelIdentifier.fromLanguageTag("en-US")
+    ).build();
+
+// Create a recognizer.
+DigitalInkRecognizer recognizer =
+    DigitalInkRecognition.getClient(
+        DigitalInkRecognizerOptions.builder(model).build());
+
+// Optionally, provide recognition context to improve accuracy.
+RecognitionContext recognitionContext =
+    RecognitionContext.builder()
+                      .setPreContext(preContext)
+                      .setWritingArea(new WritingArea(width, height))
+                      .build();
+
+// Recognize an Ink.
+recognizer.recognize(ink, recognitionContext)
+    .addOnSuccessListener(
+        // Get the top-candidate's text prediction.
+        result -> result.getCandidates().get(0).getText());
+```
+
+
+
 ### [MyScript](https://developer.myscript.com/)
 
 MyScript is a commercial cross-platform ink SDK. It runs on Windows, iOS, Android, and Web. It requires a subscription to use, and can perform on-device recognition or acts as a cloud service.
