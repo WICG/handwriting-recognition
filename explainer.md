@@ -553,6 +553,7 @@ However, we aren't aware of any recognizer implementations that falls within thi
 Web developers may provide subtags (e.g. region and script). The implementation should interpret them, and choose fallbacks if necessary. In general:
 
 * If the provided language tag doesn't match any recognizer, remove the last subtag until there is a match. For example, `"zh-Hans-CN"` -> `"zh-Hans"` -> `"zh"`.
+* If the provided language tag contains private tags (e.g. "zxx-x-shape"), the private tags shouldn't be removed. The implementation should take private tags into consideration when matching recognizers.
 * If the browser can't match any recognizer (after the above fallbacks), `createHandwritingRecognizer` rejects with an Error.
 
 If language model constraints aren't provided, the implementation should reject the promise with an error.
