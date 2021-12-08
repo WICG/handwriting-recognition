@@ -22,6 +22,7 @@ ci: spec.bs
 	mkdir -p out
 	make remote
 	mv spec.html out/index.html
+	cp -r images out/
 
 clean:
 	rm spec.html
