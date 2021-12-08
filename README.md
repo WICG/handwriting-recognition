@@ -7,7 +7,7 @@ Welcome to the WICG repository for the Handwriting Recognition API. This API aim
 ## Links
 
 * [Explainer](./explainer.md)
-* [Interface Definition (Web IDL)](./idl.md)
+* [Interface Definition (Web IDL)](https://wicg.github.io/handwriting-recognition/#idl-index)
 * [Spec](https://wicg.github.io/handwriting-recognition/)
 
 Community contributed:
