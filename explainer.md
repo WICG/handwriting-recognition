@@ -555,7 +555,7 @@ Web developers may provide subtags (e.g. region and script). The implementation 
 * If the provided language tag doesn't match any recognizer, remove the last subtag until there is a match. For example, `"zh-Hans-CN"` -> `"zh-Hans"` -> `"zh"`.
 * If the browser can't match any recognizer (after the above fallbacks), `createHandwritingRecognizer` rejects with an Error.
 
-If language model constraints aren't provided, this implementation should try to pick a model based on `navigator.languages`. If this fails to match any recognizer, `createHandwritingRecognizer` rejects with an Error.
+If language model constraints aren't provided, the implementation should reject the promise with an error.
 
 ### Model Constraints vs. Model Identifier
 In the current design, we use model constraints and let the browser to determine the exact recognition models.
