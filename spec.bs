@@ -336,7 +336,7 @@ This method creates a {{HandwritingRecognizer}} object that satisfies the provid
 
 <h3 id="handwriting-recognizer-object">{{HandwritingRecognizer}} object </h3>
 <xmp class="idl">
-[SecureContext]
+[Exposed=Window, SecureContext]
 interface HandwritingRecognizer {
   [RaisesException]
   HandwritingDrawing startDrawing(optional HandwritingHints hints = {});
@@ -447,7 +447,7 @@ drawing.clear();
 </xmp>
 
 <xmp class="idl">
-[SecureContext]
+[Exposed=Window, SecureContext]
 interface HandwritingDrawing {
   undefined addStroke(HandwritingStroke stroke);
   undefined removeStroke(HandwritingStroke stroke);
