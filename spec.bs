@@ -338,10 +338,9 @@ This method creates a {{HandwritingRecognizer}} object that satisfies the provid
 <xmp class="idl">
 [Exposed=Window, SecureContext]
 interface HandwritingRecognizer {
-  [RaisesException]
   HandwritingDrawing startDrawing(optional HandwritingHints hints = {});
 
-  [RaisesException] undefined finish();
+  undefined finish();
 };
 
 dictionary HandwritingHints {
