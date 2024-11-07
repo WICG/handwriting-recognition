@@ -120,9 +120,9 @@ Take the handwritten text "int" for example:
 
 The [=task source=] mentioned in this specification is the <dfn data-export id="handwriting-recognition-task-source">handwriting recognition task source</dfn>.
 
-When an algorithm <dfn data-export lt="queues a Handwriting Recognition API task">queues a Handwriting Recognition API task</dfn> |T|, the user agent *MUST* [=queue a global task=] |T| on the [=handwriting recognition task source=] using the [=/global object=] of [=the current realm record=].
+When an algorithm <dfn data-export lt="queues a Handwriting Recognition API task">queues a Handwriting Recognition API task</dfn> |T|, the user agent *MUST* [=queue a global task=] |T| on the [=handwriting recognition task source=] using the [=/global object=] of [=ECMAScript/the current realm record=].
 
-Unless specified, the [=ECMAScript/realm=] for JavaScript objects constructed by algorithm steps is [=the current realm record=].
+Unless specified, the [=ECMAScript/realm=] for JavaScript objects constructed by algorithm steps is [=ECMAScript/the current realm record=].
 
 
 <h2 id="api-query" data-dfn-for="Navigator">Feature Query</h2>
@@ -648,7 +648,7 @@ If the handwriting recognizer wasn't able to recognize anything, {{HandwritingDr
 <div algorithm="handwriting-drawing-get-prediction">
   When {{HandwritingDrawing/getPrediction()}} is invoked:
 
-  1. If `this`.[=HandwritingDrawing/recognizer=].[=HandwritingRecognizer/active=] isn't true, return a [=/a promise rejected with=] {{"InvalidStateError"}} {{DOMException}}. 
+  1. If `this`.[=HandwritingDrawing/recognizer=].[=HandwritingRecognizer/active=] isn't true, return a [=a promise rejected with=] {{"InvalidStateError"}} {{DOMException}}. 
   1. If `this`.[=HandwritingDrawing/strokes=] is empty, return a [=a promise resolved with=] a new empty [=list=].
   1. <a lt="convert">Convert `this` drawing into a format suitable</a> for [=handwriting recognizer=].
   1. Let |p| be a new Promise, run the following step [=in parallel=]
