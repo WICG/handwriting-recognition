@@ -120,9 +120,9 @@ Take the handwritten text "int" for example:
 
 The [=task source=] mentioned in this specification is the <dfn data-export id="handwriting-recognition-task-source">handwriting recognition task source</dfn>.
 
-When an algorithm <dfn data-export id="queue-task">queues a Handwriting Recognition API task</dfn> |T|, the user agent *MUST* [=queue a global task=] |T| on the [=handwriting recognition task source=] using the [=global object=] of the [[ecma-262#current-realm|current realm]].
+When an algorithm <dfn data-export lt="queues a Handwriting Recognition API task">queues a Handwriting Recognition API task</dfn> |T|, the user agent *MUST* [=queue a global task=] |T| on the [=handwriting recognition task source=] using the [=/global object=] of [=the current realm record=].
 
-Unless specified, the [[ecma-262#realm|realm]] for JavaScript objects constructed by algorithm steps is the [[ecma-262#current-realm|current realm]].
+Unless specified, the [=ECMAScript/realm=] for JavaScript objects constructed by algorithm steps is [=the current realm record=].
 
 
 <h2 id="api-query" data-dfn-for="Navigator">Feature Query</h2>
@@ -654,7 +654,7 @@ If the handwriting recognizer wasn't able to recognize anything, {{HandwritingDr
   1. Let |p| be a new Promise, run the following step [=in parallel=]
     1. Send the converted drawing to [=handwriting recognizer=].
     1. Wait for [=handwriting recognizer=] to return its predictions.
-    1. [=Queues a Handwriting Recognition API task=], perform the following steps:
+    1. [=Queue a Handwriting Recognition API task=] to perform the following steps:
       1. Let |result| be a list.
       1. [=list/For each=] returned prediction |pred|:
         1. <a lt="convert">Convert |pred| it into </a> {{HandwritingPrediction}} |idl_pred|.
