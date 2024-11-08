@@ -116,6 +116,15 @@ Take the handwritten text "int" for example:
   If the application wants to delete character "t", it can remove stroke 3 and 4 from the drawing.
 </div>
 
+<h2 id="api-idioms">API Idioms</h2>
+
+The [=task source=] mentioned in this specification is the <dfn data-export id="handwriting-recognition-task-source">handwriting recognition task source</dfn>.
+
+When an algorithm <dfn data-export lt="queues a Handwriting Recognition API task">queues a Handwriting Recognition API task</dfn> |T|, the user agent *MUST* [=queue a global task=] |T| on the [=handwriting recognition task source=] using the [=/global object=] of [=ECMAScript/the current realm record=].
+
+Unless specified, the [=ECMAScript/realm=] for JavaScript objects constructed by algorithm steps is [=ECMAScript/the current realm record=].
+
+
 <h2 id="api-query" data-dfn-for="Navigator">Feature Query</h2>
 
 Feature query interface provides allows web applications to query implementation-specific capabilities, so they can decide whether to use its feature.
@@ -638,14 +647,19 @@ If the handwriting recognizer wasn't able to recognize anything, {{HandwritingDr
 <div algorithm="handwriting-drawing-get-prediction">
   When {{HandwritingDrawing/getPrediction()}} is invoked:
 
+  1. If `this`.[=HandwritingDrawing/recognizer=].[=HandwritingRecognizer/active=] isn't true, return a [=a promise rejected with=] {{"InvalidStateError"}} {{DOMException}}. 
+  1. If `this`.[=HandwritingDrawing/strokes=] is empty, return a [=a promise resolved with=] a new empty [=list=].
+  1. <a lt="convert">Convert `this` drawing into a format suitable</a> for [=handwriting recognizer=].
   1. Let |p| be a new Promise, run the following step [=in parallel=]
-    1. If `this`.[=HandwritingDrawing/recognizer=].[=HandwritingRecognizer/active=] isn't true, reject |p| with a new {{DOMException}} whose name is {{"InvalidStateError"}} and abort.
-    1. If `this`.[=HandwritingDrawing/strokes=] is empty, resolve |p| with a new empty [=list=].
-    1. Let |result| be a list.
-    1. <a lt="convert">Convert `this` drawing into a format suitable</a> for [=handwriting recognizer=].
-    1. Send the converted drawing to [=handwriting recognizer=], and retrieves its prediction.
-    1. <a lt="convert">Convert the retrieved predictions into </a> {{HandwritingPrediction}}, then [=list/append=] the converted predictions to |result|.
-    1. Resolve |p| with |result|.
+    1. Send the converted drawing to [=handwriting recognizer=].
+    1. Wait for [=handwriting recognizer=] to return its predictions.
+    1. [=Queue a Handwriting Recognition API task=] to perform the following steps:
+      1. Let |result| be a list.
+      1. [=list/For each=] returned prediction |pred|:
+        1. <a lt="convert">Convert |pred| into</a> {{HandwritingPrediction}} |idl_pred|.
+        1. [=list/Append=] |idl_pred| to |result|.
+      1. Resolve |p| with |result|.
+  1. Return |p|
 </div>
 
 <h3 id="handwriting-prediction">{{HandwritingPrediction}} attributes</h3>
