@@ -657,7 +657,7 @@ If the handwriting recognizer wasn't able to recognize anything, {{HandwritingDr
     1. [=Queue a Handwriting Recognition API task=] to perform the following steps:
       1. Let |result| be a list.
       1. [=list/For each=] returned prediction |pred|:
-        1. <a lt="convert">Convert |pred| it into </a> {{HandwritingPrediction}} |idl_pred|.
+        1. <a lt="convert">Convert |pred| into</a> {{HandwritingPrediction}} |idl_pred|.
         1. [=list/Append=] |idl_pred| to |result|.
       1. Resolve |p| with |result|.
   1. Return |p|
