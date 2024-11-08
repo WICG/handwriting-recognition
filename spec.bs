@@ -191,15 +191,21 @@ The same {{HandwritingModelConstraint}} can be used to invoke {{Navigator/create
 <div algorithm="navigator-query-handwriting-recognizer">
   When {{Navigator/queryHandwritingRecognizer(constraint)}} method is invoked, do the following:
 
-  1. If |constraint| doesn't have a {{HandwritingModelConstraint/languages}} member, [=exception/throw=] a new {{TypeError}}
+  1. If |constraint| doesn't have a {{HandwritingModelConstraint/languages}} member, return [=a promise rejected with=] a new {{TypeError}}.
   1. Let |p| be [=a new promise=].
-  1. Run the following step [=in parallel=]
-    1. If |constraint|'s {{HandwritingModelConstraint/languages}} member is an empty array, [=/resolve=] |p| with `null` and abort.
+  1. Run the following step [=in parallel=]:
     1. <a lt="convert">Convert |constraint| into a suitable form for handwriting recognizer</a>.
-    1. If the user agent can't find or create a [=handwriting recognizer=] that satisfies the converted |constraint|, [=/resolve=] |p| with `null` and abort.
-    1. Let |result| be a new {{HandwritingRecognizerQueryResult}}
-    1. <a lt="convert">Convert the handwriting recognizer's feature description</a>, and fills in all members of |result|,.
-    1. [=/Resolve=] |p| with |result|.
+    1. If any of the following is true:
+      * |constraint|'s {{HandwritingModelConstraint/languages}} member is an empty [=list=].
+      * The user agent can't find or create a platform-dependent [=handwriting recognizer=] that satisfies the converted |constraint|.
+
+      [=Queue a handwriting recognition API task=] to resolve |p| with with `null` and abort the remaining steps.
+
+    1. Otherwise, [=queue a handwriting recognition API task=] to:
+      1. Let |result| be a new {{HandwritingRecognizerQueryResult}}
+      1. <a lt="convert">Convert the handwriting recognizer's feature description</a>, and populate all members of |result|.
+      1. [=/Resolve=] |p| with |result|.
+  1. Return |p|.
 
 The implementation should follow these rules when converting to {{HandwritingRecognizerQueryResult}} and {{HandwritingHintsQueryResult}}:
   * If the recognizer doesn't accept any hint, set {{HandwritingRecognizerQueryResult/hints}} to `null`.
@@ -317,18 +323,22 @@ This method creates a {{HandwritingRecognizer}} object that satisfies the provid
 <div algorithm="navigator-create-handwriting-recognizer">
   When {{Navigator/createHandwritingRecognizer(constraint)}} method is invoked, do the following:
 
-  1. If |constraint| doesn't have a {{HandwritingModelConstraint/languages}} member, [=exception/throw=] a new {{TypeError}}
+  1. If |constraint| doesn't have a {{HandwritingModelConstraint/languages}} member, return [=a promise rejected with=] {{TypeError}}.
   1. Let |p| be [=a new promise=].
-  1. Run the following step [=in parallel=]
-    1. If |constraint|'s {{HandwritingModelConstraint/languages}} is an empty array, [=/reject=] |p| with a new {{DOMException}} whose {{DOMException/name}} attribute is {{"NotSupportedError"}} and abort.
-    1. <a lt="convert">Convert |constraint| into a suitable form</a> for [=handwriting recognizer=].
-    1. If the user agent can't find a [=handwriting recognizer=] that satisfies the converted |constraint|, [=/reject=] |p| with a new {{DOMException}} whose {{DOMException/name}} attribute is {{"NotSupportedError"}} and abort.
-    1. If creating a [=handwriting recognizer=] would cause the user agent to exceed its limit for total number of active recognizer, [=/reject=] |p| with a new {{DOMException}} whose {{DOMException/name}} attribute is {{"QuotaExceededError"}}.
-    1. If the user agent can't prepare [=handwriting recognizer=] to perform recognitions, [=/reject=] |p| with a new {{DOMException}} object whose name depending on the failure cause and abort:
-      * If the web application shouldn't retry, {{"OperationError"}}.
-      * Otherwise {{"UnknownError"}}.
-    1. Let |result| be a new {{HandwritingRecognizer}} object, whose [=HandwritingRecognizer/active=] flag is `true`
-    1. [=/Resolve=] |p| with |result|.
+  1. Run the following step [=in parallel=]:
+    1. <a lt="convert">Convert |constraint| into a suitable form</a> for creating a platform-dependent [=handwriting recognizer=].
+    1. If the user agent can't create or prepare a [=handwriting recognizer=] to perform recognitions, [=queue a Handwriting Recognition API task=] to [=/reject=] |p| with a new {{DOMException}} according to the failure cause, then abort the remaining steps:
+      * If |constraint|'s {{HandwritingModelConstraint/languages}} is an empty [=list=], {{"NotSupportedError"}}.
+      * If the user agent can't find a platform-dependent [=handwriting recognizer=] that satisfies the converted |constraint|, {{"NotSupportedError"}}.
+      * If creating a [=handwriting recognizer=] would cause the user agent to exceed its limit for total number of active recognizer, {{"QuotaExceededError"}}.
+      * If the web application can retry calling this method, {{OperationError}}.
+      * For all other failure causes, {{"UnknownError"}}
+    1. [=Queue a Handwriting Recognition API task=] to:
+      1. Let |result| be a new {{HandwritingRecognizer}} object.
+      1. Associate |result| with the platform-dependent [=handwriting recognizer=] created in the previous step.
+      1. Set |result|.[=HandwritingRecognizer/active=] flag to `true`.
+      1. [=/Resolve=] |p| with |result|.
+  1. Return |p|
 </div>
 
 <h2 id="using-a-recognizer">Use a recognizer</h2>
