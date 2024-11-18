@@ -327,17 +327,18 @@ This method creates a {{HandwritingRecognizer}} object that satisfies the provid
   1. Let |p| be [=a new promise=].
   1. Run the following steps [=in parallel=]:
     1. <a lt="convert">Convert |constraint| into a suitable form</a> for creating a platform-dependent [=handwriting recognizer=].
-    1. If the user agent can't create or prepare a [=handwriting recognizer=] to perform recognitions, [=queue a Handwriting Recognition API task=] to [=/reject=] |p| with a new {{DOMException}} according to the failure cause, then abort the remaining steps:
-      * If |constraint|'s {{HandwritingModelConstraint/languages}} is an empty [=list=], {{"NotSupportedError"}}.
-      * If the user agent can't find a platform-dependent [=handwriting recognizer=] that satisfies the converted |constraint|, {{"NotSupportedError"}}.
-      * If creating a [=handwriting recognizer=] would cause the user agent to exceed its limit for total number of active recognizer, {{"QuotaExceededError"}}.
-      * If the web application can retry calling this method, {{OperationError}}.
-      * For all other failure causes, {{"UnknownError"}}
     1. [=Queue a Handwriting Recognition API task=] to:
-      1. Let |result| be a new {{HandwritingRecognizer}} object.
-      1. Associate |result| with the platform-dependent [=handwriting recognizer=] created in the previous step.
-      1. Set |result|.[=HandwritingRecognizer/active=] flag to `true`.
-      1. [=/Resolve=] |p| with |result|.
+      1. If the user agent can't create or prepare a [=handwriting recognizer=] to perform recognitions, [=/reject=] |p| with a new {{DOMException}} according to the failure cause:
+        * If |constraint|'s {{HandwritingModelConstraint/languages}} is an empty [=list=], {{"NotSupportedError"}}.
+        * If the user agent can't find a platform-dependent [=handwriting recognizer=] that satisfies the converted |constraint|, {{"NotSupportedError"}}.
+        * If creating a [=handwriting recognizer=] would cause the user agent to exceed its limit for total number of active recognizer, {{"QuotaExceededError"}}.
+        * If the web application can retry calling this method, {{OperationError}}.
+        * For all other failure causes, {{"UnknownError"}}
+      1. Otherwise:
+        1. Let |result| be a new {{HandwritingRecognizer}} object.
+        1. Associate |result| with the platform-dependent [=handwriting recognizer=] created in the previous step.
+        1. Set |result|.[=HandwritingRecognizer/active=] flag to `true`.
+        1. [=/Resolve=] |p| with |result|.
   1. Return |p|
 </div>
 
