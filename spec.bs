@@ -65,7 +65,7 @@ We expect user agents to convert Web API data structure (defined in this spec) t
 
 The API doesn't attempt to define recognition that behaves the same on all platforms.
 
-<h2 id="introduction-handwriting"> Definitions </h3>
+<h3 id="introduction-handwriting"> Definitions </h3>
 In this spec, we define the following concepts, using the handwritten “WEB” for example:
 
 <img src="images/handwriting-concept.svg" alt="Handwriting Concepts" width="100%">
