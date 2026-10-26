@@ -658,8 +658,8 @@ If the handwriting recognizer wasn't able to recognize anything, {{HandwritingDr
 <div algorithm="handwriting-drawing-get-prediction">
   When {{HandwritingDrawing/getPrediction()}} is invoked:
 
-  1. If `this`.[=HandwritingDrawing/recognizer=].[=HandwritingRecognizer/active=] isn't true, return a [=a promise rejected with=] {{"InvalidStateError"}} {{DOMException}}.
-  1. If `this`.[=HandwritingDrawing/strokes=] is empty, return a [=a promise resolved with=] a new empty [=list=].
+  1. If `this`.[=HandwritingDrawing/recognizer=].[=HandwritingRecognizer/active=] isn't true, return [=a promise rejected with=] {{"InvalidStateError"}} {{DOMException}}.
+  1. If `this`.[=HandwritingDrawing/strokes=] is empty, return [=a promise resolved with=] a new empty [=list=].
   1. <a lt="convert">Convert `this` drawing into a format suitable</a> for [=handwriting recognizer=].
   1. Let |p| be a new Promise, run the following step [=in parallel=]
     1. Send the converted drawing to [=handwriting recognizer=].
