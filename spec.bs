@@ -778,10 +778,10 @@ The attributes are based on the {{HandwritingStroke}} in the {{HandwritingDrawin
   <dd>The index of the {{HandwritingStroke}} in {{HandwritingDrawing}}.[=HandwritingDrawing/strokes=].
   </dd>
 
-  <dt><code>beginIndex</code></dt>
+  <dt><code>beginPointIndex</code></dt>
   <dd>The index where the drawing segment begins.</dd>
 
-  <dt><code>endIndex</code></dt>
+  <dt><code>endPointIndex</code></dt>
   <dd>The index where the drawing segment ends (where the next drawing segment begins).</dd>
 </dl>
 
