@@ -744,26 +744,21 @@ const prediction = {
   // Graphemes: घो, षि, त
   text: "घोषित",
   segmentationResult: [
-    { grapheme: "घो", beginIndex: "0", endIndex: "2" },
-    { grapheme: "षि", beginIndex: "2", endIndex: "4" },
-    { grapheme: "त", beginIndex: "4", endIndex: "5" },
+    { grapheme: "घो", beginIndex: 0, endIndex: 2 },
+    { grapheme: "षि", beginIndex: 2, endIndex: 4 },
+    { grapheme: "त", beginIndex: 4, endIndex: 5 },
   ]
 }
 
 // The followings are true:
-prediction.text.slice(0, 1) === "घो";
+prediction.text.slice(0, 2) === "घो";
 prediction.text.slice(2, 4) === "षि";
 prediction.text.slice(4, 5) === "त";
 
-// Web applications can delete the 2nd grapheme (षि) by splicing.
-const withoutSecondGrapheme = (
-  [...prediction.text]
-    .splice(
-      prediction.segmentationResult[1].beginIndex,
-      prediction.segmentationResult[1].endIndex
-    )
-    .join('')
-);
+// Web applications can delete the 2nd grapheme (षि) using these indices.
+const { beginIndex, endIndex } = prediction.segmentationResult[1];
+const withoutSecondGrapheme =
+  prediction.text.slice(0, beginIndex) + prediction.text.slice(endIndex);
 // => "घोत"
 </xmp>
 
