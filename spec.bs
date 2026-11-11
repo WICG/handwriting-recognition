@@ -392,7 +392,7 @@ This method creates a {{HandwritingDrawing}} which stores the drawing informatio
   1. <a lt="convert">Convert the provided |hints| to format suitable</a> for [=handwriting recognizer=].
   1. Create a new {{HandwritingDrawing}} as |result|, store the converted hint in it if necessary.
   1. Set |result|.[=HandwritingDrawing/recognizer=] to `this`.
-  1. Set `this`.[=HandwritingDrawing/strokes=] to an new empty [=list=].
+  1. Set |result|.[=HandwritingDrawing/strokes=] to a new empty [=list=].
   1. Return |result|.
 
   If the provided |hints| contains features unsupported by [=handwriting recognizer=], the user agent should ignore relevant attributes.
