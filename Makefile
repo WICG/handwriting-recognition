@@ -4,11 +4,12 @@ local: spec.bs
 	bikeshed --die-on=warning spec spec.bs spec.html
 
 spec.html: spec.bs
-	@ (HTTP_STATUS=$$(curl https://api.csswg.org/bikeshed/ \
+	@ (HTTP_STATUS=$$(curl https://www.w3.org/publications/spec-generator/ \
 	                       --output spec.html \
 	                       --write-out "%{http_code}" \
 	                       --header "Accept: text/plain, text/html" \
-	                       -F die-on=warning \
+	                       -F type=bikeshed-spec \
+                       -F die-on=warning \
 	                       -F file=@spec.bs) && \
 	[[ "$$HTTP_STATUS" -eq "200" ]]) || ( \
 		echo ""; cat spec.html; echo ""; \
