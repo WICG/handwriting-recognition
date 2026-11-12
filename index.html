@@ -1006,15 +1006,16 @@ Some handwriting recognizers available on operating systems include:
 
 <c- c1>// \`modelDesc\` describes the handwriting recognizer meeting the \`modelConstraint\`.</c->
 <c- c1>// If the constraints can't be satisfied, \`modelDesc\` will be null.</c->
-<c- p>{</c->
+<c- c1>// Example result:</c->
+<c- a>const</c-> exampleResult <c- o>=</c-> <c- p>{</c->
   textAlternatives<c- o>:</c-> <c- kc>true</c-><c- p>,</c->
   textSegmentation<c- o>:</c-> <c- kc>true</c-><c- p>,</c->
   hints<c- o>:</c-> <c- p>{</c->
     alternatives<c- o>:</c-> <c- kc>true</c-><c- p>,</c->
     textContext<c- o>:</c-> <c- kc>true</c-><c- p>,</c->
-    inputTypes<c- o>:</c-> <c- p>[</c-><c- t>'mouse'</c-><c- p>,</c-> <c- t>'touch'</c-><c- p>,</c-> <c- t>'stylus'</c-><c- p>]</c->
+    inputType<c- o>:</c-> <c- p>[</c-><c- t>'mouse'</c-><c- p>,</c-> <c- t>'touch'</c-><c- p>,</c-> <c- t>'stylus'</c-><c- p>]</c->
   <c- p>}</c->
-<c- p>}</c->
+<c- p>};</c->
 </pre>
 <pre class="def highlight idl">[<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext"><c- g>SecureContext</c-></a>]
 <c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator" id="ref-for-navigator"><c- g>Navigator</c-></a> {
@@ -1237,7 +1238,7 @@ This method creates a <code class="idl"><a data-link-type="idl" href="#handwriti
    </div>
    <h2 class="heading settled" data-level="5" id="using-a-recognizer"><span class="secno">5. </span><span class="content">Use a recognizer</span><a class="self-link" href="#using-a-recognizer"></a></h2>
 <pre class="example highlight" id="example-recognizer"><a class="self-link" href="#example-recognizer"></a><c- a>const</c-> drawingHints <c- o>=</c-> <c- p>{</c-> textContext<c- o>:</c-> <c- u>"Hello world."</c-> <c- p>}</c->
-<c- a>const</c-> drawing <c- o>=</c-> recognizer<c- p>.</c->startDrawing<c- p>(</c->textContext<c- p>)</c->
+<c- a>const</c-> drawing <c- o>=</c-> recognizer<c- p>.</c->startDrawing<c- p>(</c->drawingHints<c- p>)</c->
 
 <c- c1>// Do something with \`drawing\`.</c->
 
@@ -1327,7 +1328,7 @@ handwritingStroke<c- p>.</c->addPoint<c- p>({</c-> x<c- o>:</c-> <c- mf>7</c-><c
 <c- c1>// has no effect.</c->
 <c- a>const</c-> points <c- o>=</c-> handwritingStroke<c- p>.</c->getPoints<c- p>();</c->
 
-<c- p>[</c-> <c- p>{</c-> x<c- o>:</c-> <c- mf>1</c-><c- o>:</c-><c- p>,</c-> t<c- o>:</c-><c- mf>2</c-><c- p>,</c-> t<c- o>:</c-> <c- mf>0</c-> <c- p>},</c-> <c- p>{</c-> x<c- o>:</c-> <c- mf>7</c-><c- p>,</c-> y<c- o>:</c-> <c- mf>6</c-><c- p>,</c-> t<c- o>:</c-> <c- mf>33</c-><c- p>}</c-> <c- p>];</c->
+<c- c1>// => [{ x: 1, y: 2, t: 0 }, { x: 7, y: 6, t: 33 }]</c->
 
 <c- c1>// Delete all points in a stroke.</c->
 handwritingStroke<c- p>.</c->clear<c- p>();</c->
@@ -1536,16 +1537,16 @@ Modifying the return value of <code class="idl"><a data-link-type="idl" href="#d
     text<c- o>:</c-> <c- u>"hello"</c-><c- p>,</c->
     segmentationResult<c- o>:</c-> <c- p>[</c->
       <c- p>{</c->
-        grapheme<c- o>:</c-> <c- u>"h"</c-><c- p>,</c-> beginIndex<c- o>:</c-> <c- u>"0"</c-><c- p>,</c-> endIndex<c- o>:</c-> <c- u>"1"</c-><c- p>,</c->
+        grapheme<c- o>:</c-> <c- u>"h"</c-><c- p>,</c-> beginIndex<c- o>:</c-> <c- mf>0</c-><c- p>,</c-> endIndex<c- o>:</c-> <c- mf>1</c-><c- p>,</c->
         drawingSegments<c- o>:</c-> <c- p>[</c->
           <c- p>{</c-> strokeIndex<c- o>:</c-> <c- mf>1</c-><c- p>,</c-> beginPointIndex<c- o>:</c-> <c- mf>0</c-><c- p>,</c-> endPointIndex<c- o>:</c-> <c- mf>32</c-> <c- p>},</c->
-          <c- p>{</c-> strokeIndex<c- o>:</c-> <c- mf>2</c-> <c- p>,</c-> beginPointIndex<c- o>:</c-> <c- mf>0</c-><c- p>,</c-> endPointIndex<c- o>::</c-> <c- mf>40</c-> <c- p>},</c->
+          <c- p>{</c-> strokeIndex<c- o>:</c-> <c- mf>2</c-> <c- p>,</c-> beginPointIndex<c- o>:</c-> <c- mf>0</c-><c- p>,</c-> endPointIndex<c- o>:</c-> <c- mf>40</c-> <c- p>},</c->
         <c- p>]</c->
       <c- p>},</c->
       <c- p>{</c->
-        grapheme<c- o>:</c-> <c- u>"2"</c-><c- p>,</c-> beginIndex<c- o>:</c-> <c- u>"1"</c-><c- p>,</c-> endIndex<c- o>:</c-> <c- u>"2"</c-><c- p>,</c->
+        grapheme<c- o>:</c-> <c- u>"e"</c-><c- p>,</c-> beginIndex<c- o>:</c-> <c- mf>1</c-><c- p>,</c-> endIndex<c- o>:</c-> <c- mf>2</c-><c- p>,</c->
         drawingSegments<c- o>:</c-> <c- p>[</c->
-          <c- p>{</c-> strokeIndex<c- o>:</c-> <c- mf>2</c-> <c- p>,</c-> beginPointIndex<c- o>:</c-> <c- mf>41</c-><c- p>,</c-> endPointIndex<c- o>::</c-> <c- mf>130</c-> <c- p>},</c->
+          <c- p>{</c-> strokeIndex<c- o>:</c-> <c- mf>2</c-> <c- p>,</c-> beginPointIndex<c- o>:</c-> <c- mf>41</c-><c- p>,</c-> endPointIndex<c- o>:</c-> <c- mf>130</c-> <c- p>},</c->
         <c- p>]</c->
       <c- p>},</c->
       <c- c1>// ...</c->
