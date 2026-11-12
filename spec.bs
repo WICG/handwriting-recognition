@@ -523,7 +523,7 @@ For example, define `t === 0` to the time point when {{HandwritingRecognizer/sta
   1. If |point|.`x` isn't a number, [=exception/throw=] a new {{TypeError}} and abort.
   1. If |point| doesn't has a `y` member, [=exception/throw=] a new {{TypeError}} and abort.
   1. If |point|.`y` isn't a number, [=exception/throw=] a new {{TypeError}} and abort.
-  1. If |point| has a `t` member, and `t` isn't a number, [=exception/throw=] a new {{TypeError}} and abort.
+  1. If |point| has a `t` member, and |point|.`t` isn't a number, [=exception/throw=] a new {{TypeError}} and abort.
   1. Let |p| be a new object,
   1. Set |p|.`x` to |point|.`x`
   1. Set |p|.`y` to |point|.`y`
@@ -545,7 +545,7 @@ This method returns points in this stroke.
   When this method is invoked:
 
   1. Let |result| be a new empty [=list=]
-  1. For each [=HandwritingStroke/points=] as |p|
+  1. For each `this`.[=HandwritingStroke/points=] as |p|
     1. Create a new {{object}} as |pt|
     1. Set |pt|.`x` member to |p|.`x`
     1. Set |pt|.`y` member to |p|.`y`
@@ -594,7 +594,7 @@ This method returns a list of strokes in this drawing.
   When this method is invoked,
 
   1. Let |result| be a new empty [=list=]
-  1. For each [=HandwritingDrawing/strokes=] as |s|
+  1. For each `this`.[=HandwritingDrawing/strokes=] as |s|
     1. [=list/Append=] |s| to |result|
   1. Return |result|
 </div>
