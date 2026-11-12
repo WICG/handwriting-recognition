@@ -135,15 +135,16 @@ Feature query interface provides allows web applications to query implementation
 
   // \`modelDesc\` describes the handwriting recognizer meeting the \`modelConstraint\`.
   // If the constraints can't be satisfied, \`modelDesc\` will be null.
-  {
+  // Example result:
+  const exampleResult = {
     textAlternatives: true,
     textSegmentation: true,
     hints: {
       alternatives: true,
       textContext: true,
-      inputTypes: ['mouse', 'touch', 'stylus']
+      inputType: ['mouse', 'touch', 'stylus']
     }
-  }
+  };
 </xmp>
 
 <xmp class="idl">
@@ -346,7 +347,7 @@ This method creates a {{HandwritingRecognizer}} object that satisfies the provid
 
 <xmp class="example" id="example-recognizer" highlight="javascript">
   const drawingHints = { textContext: "Hello world." }
-  const drawing = recognizer.startDrawing(textContext)
+  const drawing = recognizer.startDrawing(drawingHints)
 
   // Do something with \`drawing\`.
 
@@ -443,7 +444,7 @@ handwritingStroke.addPoint({ x: 7, y: 6, t: 33});
 // has no effect.
 const points = handwritingStroke.getPoints();
 
-[ { x: 1:, t:2, t: 0 }, { x: 7, y: 6, t: 33} ];
+// => [{ x: 1, y: 2, t: 0 }, { x: 7, y: 6, t: 33 }]
 
 // Delete all points in a stroke.
 handwritingStroke.clear();
@@ -620,16 +621,16 @@ const predictions = await drawing.getPrediction();
     text: "hello",
     segmentationResult: [
       {
-        grapheme: "h", beginIndex: "0", endIndex: "1",
+        grapheme: "h", beginIndex: 0, endIndex: 1,
         drawingSegments: [
           { strokeIndex: 1, beginPointIndex: 0, endPointIndex: 32 },
-          { strokeIndex: 2 , beginPointIndex: 0, endPointIndex:: 40 },
+          { strokeIndex: 2 , beginPointIndex: 0, endPointIndex: 40 },
         ]
       },
       {
-        grapheme: "2", beginIndex: "1", endIndex: "2",
+        grapheme: "e", beginIndex: 1, endIndex: 2,
         drawingSegments: [
-          { strokeIndex: 2 , beginPointIndex: 41, endPointIndex:: 130 },
+          { strokeIndex: 2 , beginPointIndex: 41, endPointIndex: 130 },
         ]
       },
       // ...
