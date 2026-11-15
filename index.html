@@ -805,7 +805,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <h1 class="no-ref p-name" id="title">Handwriting Recognition API</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>,
-    <time class="dt-updated" datetime="2026-11-12">12 November 2026</time></p>
+    <time class="dt-updated" datetime="2026-11-15">15 November 2026</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1416,7 +1416,7 @@ If web application provides <code>t</code> in <code class="idl"><a data-link-typ
      <li data-md>
       <p>If <var>point</var>.<code>y</code> isn’t a number, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw④">throw</a> a new <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror⑤">TypeError</a></code> and abort.</p>
      <li data-md>
-      <p>If <var>point</var> has a <code>t</code> member, and <code>t</code> isn’t a number, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw⑤">throw</a> a new <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror⑥">TypeError</a></code> and abort.</p>
+      <p>If <var>point</var> has a <code>t</code> member, and <var>point</var>.<code>t</code> isn’t a number, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-throw" id="ref-for-dfn-throw⑤">throw</a> a new <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#exceptiondef-typeerror" id="ref-for-exceptiondef-typeerror⑥">TypeError</a></code> and abort.</p>
      <li data-md>
       <p>Let <var>p</var> be a new object,</p>
      <li data-md>
@@ -1444,7 +1444,7 @@ If web application provides <code>t</code> in <code class="idl"><a data-link-typ
      <li data-md>
       <p>Let <var>result</var> be a new empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list⑥">list</a></p>
      <li data-md>
-      <p>For each <a data-link-type="dfn" href="#handwritingstroke-points" id="ref-for-handwritingstroke-points③">points</a> as <var>p</var></p>
+      <p>For each <code>this</code>.<a data-link-type="dfn" href="#handwritingstroke-points" id="ref-for-handwritingstroke-points③">points</a> as <var>p</var></p>
       <ol>
        <li data-md>
         <p>Create a new <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-object" id="ref-for-idl-object">object</a></code> as <var>pt</var></p>
@@ -1507,7 +1507,7 @@ Modifying the return value of <code class="idl"><a data-link-type="idl" href="#d
      <li data-md>
       <p>Let <var>result</var> be a new empty <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list" id="ref-for-list⑦">list</a></p>
      <li data-md>
-      <p>For each <a data-link-type="dfn" href="#handwritingdrawing-strokes" id="ref-for-handwritingdrawing-strokes③">strokes</a> as <var>s</var></p>
+      <p>For each <code>this</code>.<a data-link-type="dfn" href="#handwritingdrawing-strokes" id="ref-for-handwritingdrawing-strokes③">strokes</a> as <var>s</var></p>
       <ol>
        <li data-md>
         <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#list-append" id="ref-for-list-append③">Append</a> <var>s</var> to <var>result</var></p>
